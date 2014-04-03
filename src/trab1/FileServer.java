@@ -20,13 +20,13 @@ public class FileServer {
 		register(serverName, contactServerUrl, userName, ip);
 	}
 	
-	public static void register (String serverName, String contactServerUrl, String userName, InetAddress ip)
+	public static void register (String serverName, String contactServerURL, String userName, InetAddress ip)
 	{
 		ContactServer server;
 		
 		try
 		{
-			server = (ContactServer) Naming.lookup("//" + contactServerUrl + "/trabalhoSD");
+			server = (ContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 			server.registerServer(serverName, ip, userName);
 		} 
 		catch (Exception e) 

@@ -1,6 +1,7 @@
 package trab1;
 
 import java.io.*;
+import java.rmi.Naming;
 
 /**
  * Classe base do cliente
@@ -10,20 +11,22 @@ public class FileClient
 {
 	String contactServerURL;
 	String username;
+	ContactServer cs;
 	
-	protected FileClient( String url, String username) {
+	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
-		this.username = username;
+		this.username = username;	
+		cs = (ContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 	}
 	
-
 	/**
 	 * Devolve um array com os servidores a que o utilizador tem acesso.
 	 */
 	protected String[] servers() {
 		System.err.println( "exec: servers");
-		//TODO: completar
-		return null;
+		String[] list = null;
+		cs.listServers(username);
+		return list;
 	}
 	
 	/**
@@ -267,7 +270,7 @@ public class FileClient
 		}
 	}
 	
-	public static void main( String[] args) {
+	public static void main( String[] args) throws Exception {
 		if( args.length != 2) {
 			System.out.println("Use: java trab1.FileClient URL nome_utilizador");
 			return;
