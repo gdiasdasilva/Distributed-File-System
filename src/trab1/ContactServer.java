@@ -45,6 +45,18 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		return temp.toArray(new String[temp.size()]);
 	}
 	
+	@Override
+	public boolean addPermission(String server, String userName) throws RemoteException
+	{		
+		if(serversListUsers.containsKey(server) && !serversListUsers.get(server).contains(userName))
+		{
+			serversListUsers.get(server).add(userName);
+			return true;
+		}		
+		else
+			return false;		
+	}
+	
 	public static void main( String[] args) throws Exception
 	{
 		if( args.length != 0) {

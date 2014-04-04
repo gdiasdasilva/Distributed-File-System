@@ -39,8 +39,12 @@ public class FileClient
 	 */
 	protected boolean addPermission( String server, String user) {
 		System.err.println( "exec: addPermission in server " + server + " for user " + user);
-		//TODO: completar
-		return false;
+		try {
+			return cs.addPermission(server, user);
+		} catch (RemoteException e) {
+			System.out.println("Nao foi possivel adicionar a permissao.");
+			return false;
+		}
 	}
 
 	/**

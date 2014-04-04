@@ -20,5 +20,11 @@ public interface IContactServer extends Remote {
 	 * @param userName
 	 */
 	public void registerServer(String serverName, InetAddress serverIP, String userName) throws RemoteException;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean addPermission(String server, String userName) throws RemoteException; 
 
 }
