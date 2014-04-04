@@ -3,13 +3,15 @@ package trab1;
 import java.net.InetAddress;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.server.*;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-public class ContactServer extends UnicastRemoteObject {
-	
+public class ContactServer extends UnicastRemoteObject implements IContactServer {
+		
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
-	
 	private Map<String, InetAddress> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
 	
@@ -33,9 +35,14 @@ public class ContactServer extends UnicastRemoteObject {
 	 */
 	public String[] listServers(String userName)
 	{
-		String temp[] = new String[serversListIP.size()];
-		temp = (String[]) serversListIP.keySet().toArray();
-		return temp;
+		List<String> temp = new ArrayList<String>();		
+		
+		for (String key : serversListUsers.keySet()) {
+		    if (serversListUsers.get(key).contains(userName))
+		    	temp.add(key);
+		}
+				
+		return temp.toArray(new String[temp.size()]);
 	}
 	
 	public static void main( String[] args) throws Exception

@@ -2,6 +2,7 @@ package trab1;
 
 import java.io.*;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 
 /**
  * Classe base do cliente
@@ -11,21 +12,22 @@ public class FileClient
 {
 	String contactServerURL;
 	String username;
-	ContactServer cs;
+	IContactServer cs;
 	
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
 		this.username = username;	
-		cs = (ContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
+		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 	}
 	
 	/**
 	 * Devolve um array com os servidores a que o utilizador tem acesso.
+	 * @throws RemoteException 
 	 */
-	protected String[] servers() {
+	protected String[] servers() throws RemoteException {
 		System.err.println( "exec: servers");
 		String[] list = null;
-		cs.listServers(username);
+		list = cs.listServers(username);
 		return list;
 	}
 	

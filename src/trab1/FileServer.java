@@ -22,11 +22,11 @@ public class FileServer {
 	
 	public static void register (String serverName, String contactServerURL, String userName, InetAddress ip)
 	{
-		ContactServer server;
+		IContactServer server;
 		
 		try
 		{
-			server = (ContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
+			server = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 			server.registerServer(serverName, ip, userName);
 		} 
 		catch (Exception e) 
