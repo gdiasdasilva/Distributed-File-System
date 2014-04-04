@@ -59,7 +59,7 @@ public class ContactServer extends UnicastRemoteObject {
 		}
 		
 		ContactServer server = new ContactServer();
-		Naming.rebind( "/trabalhoSD", server); ---- esta a dar erro. acesso negado. policy?
+		Naming.rebind( "/trabalhoSD", server);
 		System.out.println( "ContactServer running...");
 	}
 	
