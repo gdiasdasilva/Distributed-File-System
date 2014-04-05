@@ -184,13 +184,13 @@ public class FileClient
 	 */
 	protected FileInfo getAttr( String server, String user, String path) {
 		System.err.println( "exec: getattr " + path +  " no servidor " + server + "@" + user);
-		// falta fazer todas as alteraçoes e criar os metodos respectivos no file server
+
 		try
 		{
-			String address = cs.serverAddress(server,user);
+			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address);
-				return null;
+				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);	
+				return fs.getAttr(path);
 			}
 			else{
 				System.out.println("Endereço incorrecto");
@@ -199,7 +199,7 @@ public class FileClient
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel obter a informaçao sobre o ficheiro.");
+			System.out.println("Nao foi possivel obter a informacao sobre o ficheiro.");
 			return null;
 		}
 	}

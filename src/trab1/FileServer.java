@@ -6,6 +6,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Date;
 
 public class FileServer extends UnicastRemoteObject implements IFileServer {
 	
@@ -77,6 +78,19 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			return f.delete();
 		else
 			return false;
+	}
+	
+	@Override
+	public FileInfo getAttr(String path) throws RemoteException, InfoNotFoundException {
+		File dir = new File(new File(path), basePath);
+		if( dir.exists()) {
+			File f = new File(dir, path);
+			if( f.exists())
+				return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
+			else
+				throw new InfoNotFoundException( "File not found :" + path);
+		} else
+			throw new InfoNotFoundException( "Directory not found :" + path);
 	}
 	
 	public static void main( String[] args) throws Exception

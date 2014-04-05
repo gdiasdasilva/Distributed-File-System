@@ -40,5 +40,13 @@ public interface IFileServer extends Remote{
 	 * @throws RemoteException
 	 */
 	public boolean rm(String dir) throws RemoteException;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws RemoteException
+	 * @throws InfoNotFoundException 
+	 */
+	public FileInfo getAttr(String path) throws RemoteException, InfoNotFoundException; 
 
 }
