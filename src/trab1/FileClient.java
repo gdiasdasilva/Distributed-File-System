@@ -13,6 +13,7 @@ public class FileClient
 	String contactServerURL;
 	String username;
 	IContactServer cs;
+	IFileServer fs;
 	
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
@@ -74,8 +75,15 @@ public class FileClient
 		
 		try
 		{
-			
-			return null;
+			String address = cs.serverAddress(server,user);
+			if(address != null){
+				fs = (IFileServer) Naming.lookup("//" + address);
+				return fs.dir(dir);
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return null;
+			}
 		}
 		catch (Exception e)
 		{
@@ -93,7 +101,23 @@ public class FileClient
 	protected boolean mkdir( String server, String user, String dir) {
 		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
 		
-		return false;
+		try
+		{
+			String address = cs.serverAddress(server,user);
+			if(address != null){
+				fs = (IFileServer) Naming.lookup("//" + address);
+				return fs.mkdir(dir);
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return false;
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Nao foi possivel criar a directoria.");
+			return false;
+		}
 	}
 
 	/**
@@ -104,8 +128,24 @@ public class FileClient
 	 */
 	protected boolean rmdir( String server, String user, String dir) {
 		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
-		//TODO: completar
-		return false;
+		
+		try
+		{
+			String address = cs.serverAddress(server,user);
+			if(address != null){
+				fs = (IFileServer) Naming.lookup("//" + address);
+				return fs.rmdir(dir);
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return false;
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Nao foi possivel remover a directoria.");
+			return false;
+		}
 	}
 
 	/**
@@ -116,8 +156,24 @@ public class FileClient
 	 */
 	protected boolean rm( String server, String user, String path) {
 		System.err.println( "exec: rm " + path + " no servidor " + server + "@" + user);
-		//TODO: completar
-		return false;
+		
+		try
+		{
+			String address = cs.serverAddress(server,user);
+			if(address != null){
+				fs = (IFileServer) Naming.lookup("//" + address);
+				return fs.rm(path);
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return false;
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Nao foi possivel remover o ficheiro.");
+			return false;
+		}
 	}
 
 	/**
@@ -128,8 +184,24 @@ public class FileClient
 	 */
 	protected FileInfo getAttr( String server, String user, String path) {
 		System.err.println( "exec: getattr " + path +  " no servidor " + server + "@" + user);
-		//TODO: completar
-		return null;
+		// falta fazer todas as alteraçoes e criar os metodos respectivos no file server
+		try
+		{
+			String address = cs.serverAddress(server,user);
+			if(address != null){
+				fs = (IFileServer) Naming.lookup("//" + address);
+				return null;
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return null;
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Nao foi possivel obter a informaçao sobre o ficheiro.");
+			return null;
+		}
 	}
 
 	/**

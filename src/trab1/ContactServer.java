@@ -74,27 +74,12 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;
 	}
 	
-	public String[] dir( String server, String user, String dir, String currentUser) throws InfoNotFoundException, RemoteException{		
+	public String serverAddress(String server, String user){
 		
-		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(currentUser))
-		{
-			String basePath = "."; // confirmar o basepath TODO
-			File f = new File( basePath, dir);
-			if(f.exists())
-				return f.list();
-			else
-			{
-				return null;
-			}
-				
-		}
+		if(serversListUsers.get(server).contains(user))
+			return serversListIP.get(server).toString();
 		else
 			return null;
-	}
-	
-	public String serverAddress(String server){
-		
-		return serversListIP.get(server).toString();
 	}
 	
 	

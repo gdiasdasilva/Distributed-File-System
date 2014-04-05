@@ -39,12 +39,8 @@ public interface IContactServer extends Remote {
 	/**
 	 * 
 	 * @param server
-	 * @param user
-	 * @param dir
 	 * @return
-	 * @throws InfoNotFoundException
-	 * @throws RemoteException
 	 */
-	public String[] dir( String server, String user, String dir, String currentUser) throws InfoNotFoundException, RemoteException;
+	public String serverAddress(String server, String user);
 
 }

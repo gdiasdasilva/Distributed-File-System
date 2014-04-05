@@ -1,9 +1,13 @@
 package trab1;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 
-public class FileServer {
+public class FileServer implements IFileServer{
+	
+	private static String basePath = "/trabalhoSD";
 	
 	public static void main( String[] args) throws Exception
 	{
@@ -26,13 +30,52 @@ public class FileServer {
 		
 		try
 		{
-			server = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
+			server = (IContactServer) Naming.lookup("//" + contactServerURL + basePath);
 			server.registerServer(serverName, ip, userName);
 		} 
 		catch (Exception e) 
 		{
 			System.out.println("Erro ao fazer o lookup do Contact Server.");
 		}		
+	}
+
+	@Override
+	public String[] dir(String dir) throws InfoNotFoundException,
+			RemoteException {
+		
+		File f = new File(new File(basePath), dir);
+		
+		if(f.exists())
+			return f.list();
+		else
+			throw new InfoNotFoundException("Directory not found: " + dir);
+	}
+
+	@Override
+	public boolean mkdir(String dir) throws RemoteException {
+
+		File m = new File(new File(basePath), dir);
+		return m.mkdir();
+	}
+
+	@Override
+	public boolean rmdir(String dir) throws RemoteException {
+		
+		File r = new File(new File(basePath), dir);
+		if (r.isDirectory() && r.list().length == 0)
+			return r.delete();
+		else
+			return false;
+	}
+
+	@Override
+	public boolean rm(String dir) throws RemoteException {
+
+		File f = new File(new File(basePath), dir);
+		if (f.isFile())
+			return f.delete();
+		else
+			return false;
 	}
 	
 }
