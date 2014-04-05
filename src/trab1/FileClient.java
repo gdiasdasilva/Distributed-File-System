@@ -103,9 +103,9 @@ public class FileClient
 		
 		try
 		{
-			String address = cs.serverAddress(server,user);
+			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address);
+				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
 				return fs.mkdir(dir);
 			}
 			else{
@@ -131,9 +131,9 @@ public class FileClient
 		
 		try
 		{
-			String address = cs.serverAddress(server,user);
+			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address);
+				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
 				return fs.rmdir(dir);
 			}
 			else{
@@ -159,9 +159,9 @@ public class FileClient
 		
 		try
 		{
-			String address = cs.serverAddress(server,user);
+			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address);
+				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
 				return fs.rm(path);
 			}
 			else{

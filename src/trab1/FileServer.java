@@ -62,7 +62,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 	@Override
 	public boolean rmdir(String dir) throws RemoteException {
-		
 		File r = new File(new File(basePath), dir);
 		if (r.isDirectory() && r.list().length == 0)
 			return r.delete();
