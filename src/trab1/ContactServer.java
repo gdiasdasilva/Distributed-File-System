@@ -1,5 +1,6 @@
 package trab1;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
@@ -64,6 +65,22 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		}
 		else	
 			return false;
+	}
+	
+	public String[] dir( String server, String user, String dir) throws InfoNotFoundException{
+		
+		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
+		{
+			// falta dar o correcto basePath
+			String basePath = null;
+			File f = new File( basePath, dir);
+			if(f.exists())
+				return f.list();
+			else	
+				return null;
+		}
+		else
+			return null;
 	}
 	
 	

@@ -35,5 +35,7 @@ public interface IContactServer extends Remote {
 	 * @throws RemoteException
 	 */
 	public boolean remPermission( String server, String user) throws RemoteException;
+	
+	public String[] dir( String server, String user, String dir) throws InfoNotFoundException;
 
 }

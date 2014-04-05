@@ -71,8 +71,15 @@ public class FileClient
 	 */
 	protected String[] dir( String server, String user, String dir) {
 		System.err.println( "exec: ls " + dir + " no servidor " + server + "@" + user);
-		//TODO: completar
-		return null;
+		
+		try {
+			return cs.dir(server, user, dir);
+		} catch (InfoNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Nao foi possivel listar a directoria.");
+			return null;
+
+		}
 	}
 	
 	/**
