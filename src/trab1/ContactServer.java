@@ -78,13 +78,15 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		
 		if(serversListUsers.containsKey(server))
 		{
-			// falta dar o correcto basePath
-			String basePath = null;
+			String basePath = "."; // confirmar o basepath TODO
 			File f = new File( basePath, dir);
 			if(f.exists())
 				return f.list();
-			else	
+			else
+			{
 				return null;
+			}
+				
 		}
 		else
 			return null;
