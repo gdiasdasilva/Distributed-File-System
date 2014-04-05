@@ -74,7 +74,7 @@ public class FileClient
 		
 		try
 		{
-			return cs.dir(server, user, dir);
+			return cs.dir(server, user, dir, username);
 		}
 		catch (Exception e)
 		{
