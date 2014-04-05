@@ -69,6 +69,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	
 	public String[] dir( String server, String user, String dir) throws InfoNotFoundException{
 		//incompleto
+		
 		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
 		{
 			// falta dar o correcto basePath
