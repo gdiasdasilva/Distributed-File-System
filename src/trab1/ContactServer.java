@@ -20,12 +20,14 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	}	
 
 	public void registerServer(String serverName, InetAddress serverIP, String userName) throws RemoteException
-	{
-		String svName = serverName + "@" + userName;
-		serversListIP.put(svName, serverIP);
-		ArrayList<String> users = new ArrayList<String>();
-		users.add(userName);
-		serversListUsers.put(svName, users);
+	{		
+		if(!serversListUsers.containsKey(serverName))
+		{
+			serversListIP.put(serverName, serverIP);
+			ArrayList<String> users = new ArrayList<String>();
+			users.add(userName);
+			serversListUsers.put(serverName, users);
+		}
 	}
 	
 	/**
@@ -70,10 +72,9 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;
 	}
 	
-	public String[] dir( String server, String user, String dir) throws InfoNotFoundException, RemoteException{
-		//incompleto
+	public String[] dir( String server, String user, String dir) throws InfoNotFoundException, RemoteException{		
 		
-		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
+		if(serversListUsers.containsKey(server))
 		{
 			// falta dar o correcto basePath
 			String basePath = null;
