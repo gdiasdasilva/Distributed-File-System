@@ -1,8 +1,9 @@
 package trab1;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IFileServer {
+public interface IFileServer extends Remote{
 	
 	/**
 	 * 

@@ -1,6 +1,5 @@
 package trab1;
 
-import java.net.InetAddress;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -41,6 +40,6 @@ public interface IContactServer extends Remote {
 	 * @param server
 	 * @return
 	 */
-	public String serverAddress(String server, String user);
+	public String serverAddress(String server, String user) throws RemoteException;
 
 }

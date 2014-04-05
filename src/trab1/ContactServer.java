@@ -1,7 +1,5 @@
 package trab1;
 
-import java.io.File;
-import java.net.InetAddress;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -74,7 +72,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;
 	}
 	
-	public String serverAddress(String server, String user){
+	public String serverAddress(String server, String user) throws RemoteException {
 		
 		if(serversListUsers.get(server).contains(user))
 			return serversListIP.get(server).toString();

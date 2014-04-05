@@ -75,9 +75,9 @@ public class FileClient
 		
 		try
 		{
-			String address = cs.serverAddress(server,user);
+			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address);
+				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
 				return fs.dir(dir);
 			}
 			else{
