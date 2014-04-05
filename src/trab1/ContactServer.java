@@ -13,6 +13,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	private Map<String, InetAddress> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
 	
+	// teste Pinto
 	protected ContactServer() throws RemoteException {
 		super();
 		serversListIP = new HashMap<String, InetAddress>();
