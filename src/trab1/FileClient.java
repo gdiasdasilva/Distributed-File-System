@@ -55,8 +55,12 @@ public class FileClient
 	 */
 	protected boolean remPermission( String server, String user) {
 		System.err.println( "exec: remPermission in server " + server + " for user " + user);
-		//TODO: completar
-		return false;
+		try {
+			return cs.remPermission(server, user);
+		} catch (RemoteException e) {
+			System.out.println("Nao foi possivel remover a permissao.");
+			return false;
+		}
 	}
 
 	/**

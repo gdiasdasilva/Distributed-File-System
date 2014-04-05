@@ -8,9 +8,6 @@ import java.util.*;
 
 public class ContactServer extends UnicastRemoteObject implements IContactServer {
 		
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Map<String, InetAddress> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
@@ -57,6 +54,19 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;		
 	}
 	
+	@Override
+	public boolean remPermission(String server, String user) throws RemoteException {
+
+		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
+		{
+			serversListUsers.get(server).remove(user);
+			return true;
+		}
+		else	
+			return false;
+	}
+	
+	
 	public static void main( String[] args) throws Exception
 	{
 		if( args.length != 0) {
@@ -81,5 +91,5 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		Naming.rebind( "/trabalhoSD", server);
 		System.out.println( "ContactServer running...");
 	}
-	
+
 }

@@ -26,5 +26,14 @@ public interface IContactServer extends Remote {
 	 * @return
 	 */
 	public boolean addPermission(String server, String userName) throws RemoteException; 
+	
+	/**
+	 * 
+	 * @param server
+	 * @param user
+	 * @return
+	 * @throws RemoteException
+	 */
+	public boolean remPermission( String server, String user) throws RemoteException;
 
 }
