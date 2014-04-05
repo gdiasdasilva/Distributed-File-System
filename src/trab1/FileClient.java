@@ -74,7 +74,7 @@ public class FileClient
 		
 		try {
 			return cs.dir(server, user, dir);
-		} catch (InfoNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Nao foi possivel listar a directoria.");
 			return null;

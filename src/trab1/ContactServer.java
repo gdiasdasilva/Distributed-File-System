@@ -13,26 +13,26 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	private Map<String, InetAddress> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
 	
-	// teste Pinto
 	protected ContactServer() throws RemoteException {
 		super();
 		serversListIP = new HashMap<String, InetAddress>();
-		serversListUsers = new HashMap<String, ArrayList<String>>(); //Goncalo
+		serversListUsers = new HashMap<String, ArrayList<String>>(); 
 	}	
 
-	public void registerServer(String serverName, InetAddress serverIP, String userName)
+	public void registerServer(String serverName, InetAddress serverIP, String userName) throws RemoteException
 	{
-		serversListIP.put(serverName, serverIP);
+		String svName = serverName + "@" + userName;
+		serversListIP.put(svName, serverIP);
 		ArrayList<String> users = new ArrayList<String>();
 		users.add(userName);
-		serversListUsers.put(serverName, users);
+		serversListUsers.put(svName, users);
 	}
 	
 	/**
 	 * Lista servidores acessiveis a determinado utilizador
 	 * @return
 	 */
-	public String[] listServers(String userName)
+	public String[] listServers(String userName) throws RemoteException
 	{
 		List<String> temp = new ArrayList<String>();		
 		
@@ -68,7 +68,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;
 	}
 	
-	public String[] dir( String server, String user, String dir) throws InfoNotFoundException{
+	public String[] dir( String server, String user, String dir) throws InfoNotFoundException, RemoteException{
 		//incompleto
 		
 		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
