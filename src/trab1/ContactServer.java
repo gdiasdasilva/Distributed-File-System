@@ -16,7 +16,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	protected ContactServer() throws RemoteException {
 		super();
 		serversListIP = new HashMap<String, InetAddress>();
-		serversListUsers = new HashMap<String, ArrayList<String>>();
+		serversListUsers = new HashMap<String, ArrayList<String>>();//
 	}	
 
 	public void registerServer(String serverName, InetAddress serverIP, String userName)
