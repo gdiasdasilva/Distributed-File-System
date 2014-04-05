@@ -45,9 +45,10 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	}
 	
 	@Override
-	public boolean addPermission(String server, String userName) throws RemoteException
+	public boolean addPermission(String server, String userName, String owner) throws RemoteException
 	{		
-		if(serversListUsers.containsKey(server) && !serversListUsers.get(server).contains(userName))
+		if(serversListUsers.containsKey(server) && !serversListUsers.get(server).contains(userName) 
+				&& serversListUsers.get(server).get(0).equals(owner))
 		{
 			serversListUsers.get(server).add(userName);
 			return true;
@@ -57,9 +58,10 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	}
 	
 	@Override
-	public boolean remPermission(String server, String user) throws RemoteException {
+	public boolean remPermission(String server, String user, String owner) throws RemoteException {
 
-		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user))
+		if(serversListUsers.containsKey(server) && serversListUsers.get(server).contains(user)
+				&& serversListUsers.get(server).get(0).equals(owner) && !user.equals(owner))
 		{
 			serversListUsers.get(server).remove(user);
 			return true;

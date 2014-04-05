@@ -40,7 +40,7 @@ public class FileClient
 	protected boolean addPermission( String server, String user) {
 		System.err.println( "exec: addPermission in server " + server + " for user " + user);
 		try {
-			return cs.addPermission(server, user);
+			return cs.addPermission(server, user, username);
 		} catch (RemoteException e) {
 			System.out.println("Nao foi possivel adicionar a permissao.");
 			return false;
@@ -56,7 +56,7 @@ public class FileClient
 	protected boolean remPermission( String server, String user) {
 		System.err.println( "exec: remPermission in server " + server + " for user " + user);
 		try {
-			return cs.remPermission(server, user);
+			return cs.remPermission(server, user, username);
 		} catch (RemoteException e) {
 			System.out.println("Nao foi possivel remover a permissao.");
 			return false;

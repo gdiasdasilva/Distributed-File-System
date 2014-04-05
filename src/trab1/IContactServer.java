@@ -25,7 +25,7 @@ public interface IContactServer extends Remote {
 	 * 
 	 * @return
 	 */
-	public boolean addPermission(String server, String userName) throws RemoteException; 
+	public boolean addPermission(String server, String userName, String owner) throws RemoteException; 
 	
 	/**
 	 * 
@@ -34,8 +34,17 @@ public interface IContactServer extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	public boolean remPermission( String server, String user) throws RemoteException;
+	public boolean remPermission( String server, String user, String owner) throws RemoteException;
 	
+	/**
+	 * 
+	 * @param server
+	 * @param user
+	 * @param dir
+	 * @return
+	 * @throws InfoNotFoundException
+	 * @throws RemoteException
+	 */
 	public String[] dir( String server, String user, String dir) throws InfoNotFoundException, RemoteException;
 
 }
