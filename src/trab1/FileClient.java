@@ -74,7 +74,8 @@ public class FileClient
 		
 		try
 		{
-			return cs.dir(server, user, dir, username);
+			
+			return null;
 		}
 		catch (Exception e)
 		{
@@ -91,7 +92,7 @@ public class FileClient
 	 */
 	protected boolean mkdir( String server, String user, String dir) {
 		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
-		//TODO: completar
+		
 		return false;
 	}
 

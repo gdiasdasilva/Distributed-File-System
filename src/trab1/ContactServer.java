@@ -10,16 +10,16 @@ import java.util.*;
 public class ContactServer extends UnicastRemoteObject implements IContactServer {
 		
 	private static final long serialVersionUID = 1L;
-	private Map<String, InetAddress> serversListIP;
+	private Map<String, String> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
 	
 	protected ContactServer() throws RemoteException {
 		super();
-		serversListIP = new HashMap<String, InetAddress>();
+		serversListIP = new HashMap<String, String>();
 		serversListUsers = new HashMap<String, ArrayList<String>>(); 
 	}	
 
-	public void registerServer(String serverName, InetAddress serverIP, String userName) throws RemoteException
+	public void registerServer(String serverName, String serverIP, String userName) throws RemoteException
 	{		
 		if(!serversListUsers.containsKey(serverName))
 		{
@@ -90,6 +90,11 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		}
 		else
 			return null;
+	}
+	
+	public String serverAddress(String server){
+		
+		return serversListIP.get(server).toString();
 	}
 	
 	

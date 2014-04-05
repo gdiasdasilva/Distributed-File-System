@@ -19,7 +19,7 @@ public interface IContactServer extends Remote {
 	 * @param serverIP
 	 * @param userName
 	 */
-	public void registerServer(String serverName, InetAddress serverIP, String userName) throws RemoteException;
+	public void registerServer(String serverName, String serverIP, String userName) throws RemoteException;
 	
 	/**
 	 * 

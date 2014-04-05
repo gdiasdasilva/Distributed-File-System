@@ -15,12 +15,12 @@ public class FileServer {
 		String serverName = args[0];
 		String contactServerUrl = args[1];
 		String userName = args[2];
-		InetAddress ip = InetAddress.getLocalHost();
+		String ip = InetAddress.getLocalHost().getHostName();
 		
 		register(serverName, contactServerUrl, userName, ip);
 	}
 	
-	public static void register (String serverName, String contactServerURL, String userName, InetAddress ip)
+	public static void register (String serverName, String contactServerURL, String userName, String ip)
 	{
 		IContactServer server;
 		
