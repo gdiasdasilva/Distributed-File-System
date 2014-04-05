@@ -40,7 +40,9 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		
 		for (String key : serversListUsers.keySet()) {
 		    if (serversListUsers.get(key).contains(userName))
-		    	temp.add(key);
+		    {
+		    	temp.add(key + "@" + serversListUsers.get(key).get(0));
+		    }
 		}
 				
 		return temp.toArray(new String[temp.size()]);
