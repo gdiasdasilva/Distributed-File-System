@@ -1,5 +1,6 @@
 package trab1;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -48,5 +49,10 @@ public interface IFileServer extends Remote{
 	 * @throws InfoNotFoundException 
 	 */
 	public FileInfo getAttr(String path) throws RemoteException, InfoNotFoundException; 
+	
+	public boolean pasteFile(byte[] f, String toPath) throws RemoteException, IOException;
+	
+	public byte[] copyFile(String fromPath) throws RemoteException, IOException;
+	
 
 }

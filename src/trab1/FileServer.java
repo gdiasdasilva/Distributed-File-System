@@ -1,6 +1,12 @@
 package trab1;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -9,7 +15,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
 
 public class FileServer extends UnicastRemoteObject implements IFileServer {
-	
+
 	/**
 	 * 
 	 */
@@ -25,12 +31,12 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	}
 
 	private static String basePath = ".";
-	
-	
+
+
 	public static void register (String serverName, String contactServerURL, String userName, String ip)
 	{
 		IContactServer server;
-		
+
 		try
 		{
 			server = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
@@ -44,10 +50,10 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
-			RemoteException {
-		
+	RemoteException {
+
 		File f = new File(new File(basePath), dir);
-		
+
 		if(f.exists())
 			return f.list();
 		else
@@ -79,39 +85,73 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		else
 			return false;
 	}
-	
+
 	@Override
 	public FileInfo getAttr(String path) throws RemoteException, InfoNotFoundException {
 		File f = new File(new File(basePath), path);
 		if( f.exists()) {
-				return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
+			return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
 		} else
 			return null;
 	}
-	
+
+	@Override
+	public boolean pasteFile(byte[] f, String toPath)
+			throws RemoteException, IOException {
+
+		try{
+			File file = new File(basePath, toPath);
+			OutputStream out = new FileOutputStream(file);
+			out.write(f);
+			out.close();
+
+			return true;
+
+		} catch(Exception e){
+			return false;
+		}
+	}
+
+	@Override
+	public byte[] copyFile(String fromPath)
+			throws IOException {
+		
+		try {
+			File f = new File(basePath, fromPath);
+			InputStream input = new FileInputStream(f);
+			byte[] buffer = new byte[(int) f.length()];
+			input.read(buffer);
+			input.close();
+			return buffer;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+
+	}
+
 	public static void main( String[] args) throws Exception
 	{
 		if( args.length != 3) {
 			System.out.println("Use: java trab1.FileServer serverName contactServerURL userName");
 			return;
 		}
-		
+
 		try { // start rmiregistry
 			LocateRegistry.createRegistry( 1099);
 		} catch( RemoteException e) { 
 			// if not start it
 			// do nothing - already started with rmiregistry
 		}
-				
+
 		String serverName = args[0];
 		String contactServerUrl = args[1];
 		String userName = args[2];
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
-		
+
 		IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
 		Naming.rebind( "/" + serverName + "@" + userName, server);
-		
+
 		register(serverName, contactServerUrl, userName, ip);
 	}
-	
+
 }

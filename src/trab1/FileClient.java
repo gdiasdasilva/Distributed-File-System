@@ -215,8 +215,28 @@ public class FileClient
 							String toServer, String toUser, String toPath) {
 		System.err.println( "exec: cp " + fromPath + " no servidor " + fromServer +"@" + fromUser + " para " +
 				toPath + " no servidor " + toServer +"@" + toUser);
-		//TODO: completar
-		return false;
+		try
+		{
+			String fromAddress = cs.serverAddress(fromServer, username);
+			String toAddress = cs.serverAddress(toServer, username);
+			if(fromAddress != null && toAddress != null)
+			{
+				fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);	
+				IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+				
+				byte[] bf = fs.copyFile(fromPath);
+				return fs2.pasteFile(bf, toPath);
+			}
+			else{
+				System.out.println("Endereço incorrecto");
+				return false;
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Nao foi possivel copiar o ficheiro.");
+			return false;
+		}
 	}
 
 	
