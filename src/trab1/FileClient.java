@@ -223,7 +223,6 @@ public class FileClient
 			{
 				fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);	
 				IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
-				
 				byte[] bf = fs.copyFile(fromPath);
 				return fs2.pasteFile(bf, toPath);
 			}
