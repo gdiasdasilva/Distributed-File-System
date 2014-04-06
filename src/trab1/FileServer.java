@@ -82,15 +82,11 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	
 	@Override
 	public FileInfo getAttr(String path) throws RemoteException, InfoNotFoundException {
-		File dir = new File(new File(path), basePath);
-		if( dir.exists()) {
-			File f = new File(dir, path);
-			if( f.exists())
+		File f = new File(new File(basePath), path);
+		if( f.exists()) {
 				return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
-			else
-				throw new InfoNotFoundException( "File not found :" + path);
 		} else
-			throw new InfoNotFoundException( "Directory not found :" + path);
+			return null;
 	}
 	
 	public static void main( String[] args) throws Exception
