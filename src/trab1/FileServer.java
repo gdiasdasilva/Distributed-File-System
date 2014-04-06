@@ -136,6 +136,8 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			return;
 		}
 
+		/* sera que e preciso isto aqui em baixo ?! */
+		
 		try { // start rmiregistry
 			LocateRegistry.createRegistry( 1099);
 		} catch( RemoteException e) { 
