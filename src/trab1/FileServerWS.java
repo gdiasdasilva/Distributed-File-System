@@ -1,8 +1,15 @@
 package trab1;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.rmi.Naming;
+import java.util.Date;
 
 import javax.jws.*;
 import javax.xml.ws.Endpoint;
@@ -12,7 +19,9 @@ public class FileServerWS implements IFileServerWS {
 
 	private String serverName, contactServerUrl, userName, ip;
 	private int port;
+	private static String basePath = ".";
 
+	
 	public FileServerWS(String serverName, String contactServerUrl, String userName, String ip, int port) {
 		super();
 		this.serverName = serverName;
@@ -39,44 +48,76 @@ public class FileServerWS implements IFileServerWS {
 
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		File f = new File(new File(basePath), dir);
+
+		if(f.exists())
+			return f.list();
+		else
+			throw new InfoNotFoundException("Directory not found: " + dir);
 	}
 
 	@Override
 	public boolean mkdir(String dir) {
-		// TODO Auto-generated method stub
-		return false;
+		File m = new File(new File(basePath), dir);
+		return m.mkdir();
 	}
 
 	@Override
 	public boolean rmdir(String dir) {
-		// TODO Auto-generated method stub
-		return false;
+		File r = new File(new File(basePath), dir);
+		if (r.isDirectory() && r.list().length == 0)
+			return r.delete();
+		else
+			return false;
 	}
 
 	@Override
 	public boolean rm(String dir) {
-		// TODO Auto-generated method stub
-		return false;
+		File f = new File(new File(basePath), dir);
+		if (f.isFile())
+			return f.delete();
+		else
+			return false;
 	}
 
 	@Override
 	public FileInfo getAttr(String path) throws InfoNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		File f = new File(new File(basePath), path);
+		if( f.exists()) {
+			return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
+		} else
+			return null;
 	}
 
 	@Override
 	public boolean pasteFile(byte[] f, String toPath) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
+
+		try{
+			File file = new File(basePath, toPath);
+			OutputStream out = new FileOutputStream(file);
+			out.write(f);
+			out.close();
+
+			return true;
+
+		} catch(Exception e){
+			return false;
+		}
 	}
 
 	@Override
 	public byte[] copyFile(String fromPath) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			File f = new File(basePath, fromPath);
+			InputStream input = new FileInputStream(f);
+			byte[] buffer = new byte[(int) f.length()];
+			input.read(buffer);
+			input.close();
+			return buffer;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
 	}
 
 	public static void main( String[] args) throws Exception
@@ -100,6 +141,7 @@ public class FileServerWS implements IFileServerWS {
 				Endpoint.publish(
 						"http://" + ip + "/FileServer",
 						new FileServerWS(serverName, contactServerUrl, userName, ip, port));
+				register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
 				System.out.println( "FileServer started in port " + port);
 				break;
 			}

@@ -21,6 +21,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String serverName, contactServerUrl, userName, ip;
+	private static String basePath = ".";
 
 	protected FileServer(String serverName, String contactServerUrl, String userName, String ip) throws RemoteException {
 		super();
@@ -29,9 +30,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		this.userName = userName;
 		this.ip = ip;
 	}
-
-	private static String basePath = ".";
-
 
 	public static void register (String serverName, String contactServerURL, String userName, String ip)
 	{

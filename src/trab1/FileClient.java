@@ -1,8 +1,14 @@
 package trab1;
 
 import java.io.*;
+import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+
+import javax.xml.namespace.QName;
+
+import aula3.clt.ws.FileServerImplWS;
+import aula3.clt.ws.FileServerImplWSService;
 
 /**
  * Classe base do cliente
@@ -14,13 +20,13 @@ public class FileClient
 	String username;
 	IContactServer cs;
 	IFileServer fs;
-	
+
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
 		this.username = username;	
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 	}
-	
+
 	/**
 	 * Devolve um array com os servidores a que o utilizador tem acesso.
 	 * @throws RemoteException 
@@ -31,7 +37,7 @@ public class FileClient
 		list = cs.listServers(username);
 		return list;
 	}
-	
+
 	/**
 	 * Adiciona o utilizador user à lista de utilizadores com autorização para aceder ao servidor
 	 * server.
@@ -72,13 +78,25 @@ public class FileClient
 	 */
 	protected String[] dir( String server, String user, String dir) {
 		System.err.println( "exec: ls " + dir + " no servidor " + server + "@" + user);
-		
+
 		try
 		{
-			String address = cs.serverAddress(server,username);
-			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-				return fs.dir(dir);
+			String address = cs.serverAddress(server,username);			
+			if(address != null)
+			{
+				String[] tmp = address.split(":");
+				if(tmp[0].equals("http"))
+				{
+					//WS
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://srv.trab1/", "FileServerWSService"));
+					FileServerWS serverWS = service.getFileServerImplWSPort();
+					return serverWS.dir(dir);
+				}
+				else
+				{
+					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+					return fs.dir(dir);
+				}				
 			}
 			else{
 				System.out.println("Endereço incorrecto");
@@ -91,7 +109,7 @@ public class FileClient
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Cria a directoria dir no servidor server@user
 	 * (ou no sistema de ficheiros do cliente caso server == null).
@@ -100,7 +118,7 @@ public class FileClient
 	 */
 	protected boolean mkdir( String server, String user, String dir) {
 		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
-		
+
 		try
 		{
 			String address = cs.serverAddress(server,username);
@@ -128,7 +146,7 @@ public class FileClient
 	 */
 	protected boolean rmdir( String server, String user, String dir) {
 		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
-		
+
 		try
 		{
 			String address = cs.serverAddress(server,username);
@@ -156,7 +174,7 @@ public class FileClient
 	 */
 	protected boolean rm( String server, String user, String path) {
 		System.err.println( "exec: rm " + path + " no servidor " + server + "@" + user);
-		
+
 		try
 		{
 			String address = cs.serverAddress(server,username);
@@ -212,7 +230,7 @@ public class FileClient
 	 * NOTA: não deve lançar excepcao. 
 	 */
 	protected boolean cp( String fromServer, String fromUser, String fromPath,
-							String toServer, String toUser, String toPath) {
+			String toServer, String toUser, String toPath) {
 		System.err.println( "exec: cp " + fromPath + " no servidor " + fromServer +"@" + fromUser + " para " +
 				toPath + " no servidor " + toServer +"@" + toUser);
 		try
@@ -238,10 +256,10 @@ public class FileClient
 		}
 	}
 
-	
+
 	protected void doit() throws IOException {
 		BufferedReader reader = new BufferedReader( new InputStreamReader( System.in));
-		
+
 		for( ; ; ) {
 			String line = reader.readLine();
 			if( line == null)
@@ -259,9 +277,9 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("addPermission")) {
 				String server = cmd[1];
 				String user = cmd[2];
-				
+
 				boolean b = addPermission( server, user);
-				
+
 				if( b)
 					System.out.println( "success");
 				else
@@ -269,9 +287,9 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("remPermission")) {
 				String server = cmd[1];
 				String user = cmd[2];
-				
+
 				boolean b = remPermission( server, user);
-				
+
 				if( b)
 					System.out.println( "success");
 				else
@@ -279,11 +297,11 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("ls")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
-				
+
 				String server = dirserver.length == 1 ? null : serveruser[0];
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
-				
+
 				String[] res = dir( server, user, dir);
 				if( res != null) {
 					System.out.println( res.length);
@@ -294,7 +312,7 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("mkdir")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
-				
+
 				String server = dirserver.length == 1 ? null : serveruser[0];
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
@@ -307,7 +325,7 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("rmdir")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
-				
+
 				String server = dirserver.length == 1 ? null : serveruser[0];
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
@@ -320,7 +338,7 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("rm")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
-				
+
 				String server = dirserver.length == 1 ? null : serveruser[0];
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String path = dirserver.length == 1 ? dirserver[0] : dirserver[1];
@@ -333,7 +351,7 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("getattr")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
-				
+
 				String server = dirserver.length == 1 ? null : serveruser[0];
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String path = dirserver.length == 1 ? dirserver[0] : dirserver[1];
@@ -347,14 +365,14 @@ public class FileClient
 			} else if( cmd[0].equalsIgnoreCase("cp")) {
 				String[] dirserver1 = cmd[1].split(":");
 				String[] serveruser1 = dirserver1[0].split("@");
-				
+
 				String fromServer = dirserver1.length == 1 ? null : serveruser1[0];
 				String fromUser = dirserver1.length == 1 || serveruser1.length == 1 ? null : serveruser1[1];
 				String fromPath = dirserver1.length == 1 ? dirserver1[0] : dirserver1[1];
 
 				String[] dirserver2 = cmd[2].split(":");
 				String[] serveruser2 = dirserver2[0].split("@");
-				
+
 				String toServer = dirserver2.length == 1 ? null : serveruser2[0];
 				String toUser = dirserver2.length == 1 || serveruser2.length == 1 ? null : serveruser2[1];
 				String toPath = dirserver2.length == 1 ? dirserver2[0] : dirserver2[1];
@@ -379,7 +397,7 @@ public class FileClient
 
 		}
 	}
-	
+
 	public static void main( String[] args) throws Exception {
 		if( args.length != 2) {
 			System.out.println("Use: java trab1.FileClient URL nome_utilizador");
@@ -392,5 +410,5 @@ public class FileClient
 			e.printStackTrace();
 		}
 	}
-	
+
 }
