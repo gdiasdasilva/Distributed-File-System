@@ -21,16 +21,14 @@ public class FileServerWS implements IFileServerWS {
 	private int port;
 	private static String basePath = ".";
 
-	
 	public FileServerWS(String serverName, String contactServerUrl, String userName, String ip, int port) {
-		super();
 		this.serverName = serverName;
 		this.contactServerUrl = contactServerUrl;
 		this.userName = userName;
 		this.ip = ip;
 		this.port = port;
 	}
-	
+
 	public static void register (String serverName, String contactServerURL, String userName, String ip)
 	{
 		IContactServer server;
@@ -46,9 +44,9 @@ public class FileServerWS implements IFileServerWS {
 		}		
 	}
 
-	@Override
+	@WebMethod
 	public String[] dir(String dir) throws InfoNotFoundException {
-		
+
 		File f = new File(new File(basePath), dir);
 
 		if(f.exists())
@@ -57,13 +55,13 @@ public class FileServerWS implements IFileServerWS {
 			throw new InfoNotFoundException("Directory not found: " + dir);
 	}
 
-	@Override
+	@WebMethod
 	public boolean mkdir(String dir) {
 		File m = new File(new File(basePath), dir);
 		return m.mkdir();
 	}
 
-	@Override
+	@WebMethod
 	public boolean rmdir(String dir) {
 		File r = new File(new File(basePath), dir);
 		if (r.isDirectory() && r.list().length == 0)
@@ -72,7 +70,7 @@ public class FileServerWS implements IFileServerWS {
 			return false;
 	}
 
-	@Override
+	@WebMethod
 	public boolean rm(String dir) {
 		File f = new File(new File(basePath), dir);
 		if (f.isFile())
@@ -81,7 +79,7 @@ public class FileServerWS implements IFileServerWS {
 			return false;
 	}
 
-	@Override
+	@WebMethod
 	public FileInfo getAttr(String path) throws InfoNotFoundException {
 		File f = new File(new File(basePath), path);
 		if( f.exists()) {
@@ -90,7 +88,7 @@ public class FileServerWS implements IFileServerWS {
 			return null;
 	}
 
-	@Override
+	@WebMethod
 	public boolean pasteFile(byte[] f, String toPath) throws IOException {
 
 		try{
@@ -106,7 +104,7 @@ public class FileServerWS implements IFileServerWS {
 		}
 	}
 
-	@Override
+	@WebMethod
 	public byte[] copyFile(String fromPath) throws IOException {
 		try {
 			File f = new File(basePath, fromPath);
@@ -139,9 +137,9 @@ public class FileServerWS implements IFileServerWS {
 			try
 			{
 				Endpoint.publish(
-						"http://" + ip + "/FileServer",
+						"http://" + ip + ":" + port + "/FileServer",
 						new FileServerWS(serverName, contactServerUrl, userName, ip, port));
-				register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
+				System.out.println( "FileServer started in address " + ip);
 				System.out.println( "FileServer started in port " + port);
 				break;
 			}
@@ -149,6 +147,8 @@ public class FileServerWS implements IFileServerWS {
 			{
 				port++;
 			}
+
 		}
+		register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
 	}
 }

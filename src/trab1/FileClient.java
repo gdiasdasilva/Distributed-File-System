@@ -1,14 +1,15 @@
 package trab1;
 
 import java.io.*;
+import java.io.IOException;
 import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import aula3.clt.ws.FileServerImplWS;
-import aula3.clt.ws.FileServerImplWSService;
+import ws.*;
 
 /**
  * Classe base do cliente
@@ -88,9 +89,10 @@ public class FileClient
 				if(tmp[0].equals("http"))
 				{
 					//WS
-					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://srv.trab1/", "FileServerWSService"));
-					FileServerWS serverWS = service.getFileServerImplWSPort();
-					return serverWS.dir(dir);
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					List<String> list = serverWS.dir(dir);					
+					return list.toArray(new String[list.size()]);
 				}
 				else
 				{
@@ -123,10 +125,23 @@ public class FileClient
 		{
 			String address = cs.serverAddress(server,username);
 			if(address != null){
+				
+				String[] tmp = address.split(":");
+				if(tmp[0].equals("http"))
+				{
+					//WS
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					return serverWS.mkdir(dir);
+				}
+				else
+				{
 				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
 				return fs.mkdir(dir);
+				}
 			}
-			else{
+			else
+			{
 				System.out.println("Endereço incorrecto");
 				return false;
 			}
