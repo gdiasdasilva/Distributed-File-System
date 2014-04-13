@@ -147,6 +147,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		String contactServerUrl = args[1];
 		String userName = args[2];
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
+		System.out.println(ip);
 
 		IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
 		Naming.rebind( "/" + serverName + "@" + userName, server);

@@ -129,9 +129,9 @@ public class FileServerWS implements IFileServerWS {
 		String serverName = args[0];
 		String contactServerUrl = args[1];
 		String userName = args[2];
-		String ip = InetAddress.getLocalHost().getHostAddress().toString();		
+		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		int port = 8080;
-
+		
 		for (;;)
 		{
 			try
@@ -149,6 +149,7 @@ public class FileServerWS implements IFileServerWS {
 			}
 
 		}
+		System.out.println(ip);
 		register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
 	}
 }
