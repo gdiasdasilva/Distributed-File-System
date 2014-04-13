@@ -125,7 +125,7 @@ public class FileClient
 		{
 			String address = cs.serverAddress(server,username);
 			if(address != null){
-				
+
 				String[] tmp = address.split(":");
 				if(tmp[0].equals("http"))
 				{
@@ -136,8 +136,8 @@ public class FileClient
 				}
 				else
 				{
-				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-				return fs.mkdir(dir);
+					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+					return fs.mkdir(dir);
 				}
 			}
 			else
@@ -166,8 +166,19 @@ public class FileClient
 		{
 			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-				return fs.rmdir(dir);
+				String[] tmp = address.split(":");
+				if(tmp[0].equals("http"))
+				{
+					//WS
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					return serverWS.rmdir(dir);
+				}
+				else
+				{
+					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+					return fs.rmdir(dir);
+				}
 			}
 			else{
 				System.out.println("Endereço incorrecto");
@@ -194,8 +205,19 @@ public class FileClient
 		{
 			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-				return fs.rm(path);
+				String[] tmp = address.split(":");
+				if(tmp[0].equals("http"))
+				{
+					//WS
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					return serverWS.rm(path);
+				}
+				else
+				{
+					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+					return fs.rm(path);
+				}
 			}
 			else{
 				System.out.println("Endereço incorrecto");
@@ -222,8 +244,20 @@ public class FileClient
 		{
 			String address = cs.serverAddress(server,username);
 			if(address != null){
-				fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);	
-				return fs.getAttr(path);
+				String[] tmp = address.split(":");
+				if(tmp[0].equals("http"))
+				{
+					//WS
+					FileServerWSService service = new FileServerWSService( new URL( address + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					ws.FileInfo f = serverWS.getAttr(path);
+					return new FileInfo(f.getName(), f.getLength(), f.getModified().toGregorianCalendar().getTime(), f.isIsFile());
+				}
+				else
+				{
+					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);	
+					return fs.getAttr(path);
+				}
 			}
 			else{
 				System.out.println("Endereço incorrecto");
