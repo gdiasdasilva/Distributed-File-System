@@ -288,12 +288,36 @@ public class FileClient
 			String toAddress = cs.serverAddress(toServer, username);
 			if(fromAddress != null && toAddress != null)
 			{
-				fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);	
-				IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
-				byte[] bf = fs.copyFile(fromPath);
-				return fs2.pasteFile(bf, toPath);
+				byte[] bf;
+				String[] tmpFrom = fromAddress.split(":");
+				if(tmpFrom[0].equals("http"))
+				{
+					//WS
+					FileServerWSService serviceFrom = new FileServerWSService( new URL( fromAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWSFrom = serviceFrom.getFileServerWSPort();
+					bf = serverWSFrom.copyFile(fromPath);
+				}
+				else
+				{
+					fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);	
+					bf = fs.copyFile(fromPath);
+				}
+
+				String[] tmpTo = toAddress.split(":");
+
+				if(tmpTo[0].equals("http")){
+					FileServerWSService serviceTo = new FileServerWSService( new URL( toAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWSTo = serviceTo.getFileServerWSPort();
+					return serverWSTo.pasteFile(bf, toPath);
+				}
+				else
+				{	
+					IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+					return fs2.pasteFile(bf, toPath);
+				}
 			}
-			else{
+			else
+			{
 				System.out.println("Endereço incorrecto");
 				return false;
 			}
