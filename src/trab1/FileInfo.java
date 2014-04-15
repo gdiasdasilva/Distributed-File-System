@@ -11,6 +11,10 @@ public class FileInfo implements java.io.Serializable
 	public Date modified;
 	public boolean isFile;
 	
+	FileInfo(){
+		
+	}
+	
 	public FileInfo( String name, long length, Date modified, boolean isFile) {
 		this.name = name;
 		this.length = length;

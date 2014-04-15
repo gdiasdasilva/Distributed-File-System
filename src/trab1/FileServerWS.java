@@ -145,8 +145,9 @@ public class FileServerWS implements IFileServerWS {
 			}
 			catch( Throwable th) 
 			{
-				th.getStackTrace();
+				th.printStackTrace();;
 				port++;
+				break;
 			}
 
 		}
