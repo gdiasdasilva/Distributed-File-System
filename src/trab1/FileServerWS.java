@@ -139,19 +139,16 @@ public class FileServerWS implements IFileServerWS {
 				Endpoint.publish(
 						"http://" + ip + ":" + port + "/FileServer",
 						new FileServerWS(serverName, contactServerUrl, userName, ip, port));
-				System.out.println( "FileServer started in address " + ip);
-				System.out.println( "FileServer started in port " + port);
+				System.out.println("FileServer WS running in " + ip + ":" + port + " ...");
 				break;
 			}
 			catch( Throwable th) 
 			{
-				th.printStackTrace();;
+				th.printStackTrace();
 				port++;
-				break;
 			}
 
 		}
-		System.out.println(ip);
 		register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
 	}
 }
