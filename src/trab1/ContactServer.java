@@ -97,8 +97,9 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return false;
 	}
 
-	public String serverAddress(String server, String user) throws RemoteException {
-
+	public String serverAddress(String server, String user) throws RemoteException
+	{
+		clearUnavailableServers();
 		if(serversListUsers.get(server).contains(user))
 			return serversListIP.get(server).toString();
 		else
