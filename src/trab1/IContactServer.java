@@ -41,5 +41,7 @@ public interface IContactServer extends Remote {
 	 * @return
 	 */
 	public String serverAddress(String server, String user) throws RemoteException;
+	
+	public void clearUnavailableServers() throws RemoteException;
 
 }

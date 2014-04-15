@@ -69,5 +69,11 @@ public interface IFileServer extends Remote{
 	 */
 	public byte[] copyFile(String fromPath) throws RemoteException, IOException;
 	
+	/**
+	 * 
+	 * @throws RemoteException
+	 */
+	public void activeTest() throws RemoteException;
+	
 
 }

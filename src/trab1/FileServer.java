@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -30,6 +32,9 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		this.userName = userName;
 		this.ip = ip;
 	}
+	
+	@Override
+	public void activeTest() throws RemoteException{}
 
 	public static void register (String serverName, String contactServerURL, String userName, String ip)
 	{
@@ -113,7 +118,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	@Override
 	public byte[] copyFile(String fromPath)
 			throws IOException {
-		
+
 		try {
 			File f = new File(basePath, fromPath);
 			InputStream input = new FileInputStream(f);
@@ -135,7 +140,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		}
 
 		/* sera que e preciso isto aqui em baixo ?! */
-		
+
 		try { // start rmiregistry
 			LocateRegistry.createRegistry( 1099);
 		} catch( RemoteException e) { 

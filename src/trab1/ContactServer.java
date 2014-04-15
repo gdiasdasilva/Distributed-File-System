@@ -5,18 +5,42 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class ContactServer extends UnicastRemoteObject implements IContactServer {
-		
+
 	private static final long serialVersionUID = 1L;
 	private Map<String, String> serversListIP;
 	private Map<String, ArrayList<String>> serversListUsers;
-	
+
 	protected ContactServer() throws RemoteException {
 		super();
 		serversListIP = new HashMap<String, String>();
 		serversListUsers = new HashMap<String, ArrayList<String>>(); 
 	}	
+
+	public void clearUnavailableServers() throws RemoteException
+	{	// Feito com iteradores por causa da ConcurrentModificationException
+		Iterator<Map.Entry<String,String>> iterIP = serversListIP.entrySet().iterator();
+		Iterator<Entry<String, ArrayList<String>>> iterUsers = serversListUsers.entrySet().iterator();
+		while (iterIP.hasNext())
+		{
+			iterIP.next();
+			Map.Entry<String, ArrayList<String>> entryUsers = iterUsers.next();
+			
+			try
+			{
+				IFileServer s = (IFileServer) Naming.lookup("/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
+				s.activeTest();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				iterIP.remove();
+				iterUsers.remove();
+			}
+		}
+	}
 
 	public void registerServer(String serverName, String serverIP, String userName) throws RemoteException
 	{		
@@ -28,25 +52,25 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			serversListUsers.put(serverName, users);
 		}
 	}
-	
+
 	/**
 	 * Lista servidores acessiveis a determinado utilizador
 	 * @return
 	 */
 	public String[] listServers(String userName) throws RemoteException
 	{
+		clearUnavailableServers();
 		List<String> temp = new ArrayList<String>();		
-		
 		for (String key : serversListUsers.keySet()) {
-		    if (serversListUsers.get(key).contains(userName))
-		    {
-		    	temp.add(key + "@" + serversListUsers.get(key).get(0));
-		    }
+			if (serversListUsers.get(key).contains(userName))
+			{
+				temp.add(key + "@" + serversListUsers.get(key).get(0));
+			}
 		}
-				
+
 		return temp.toArray(new String[temp.size()]);
 	}
-	
+
 	@Override
 	public boolean addPermission(String server, String userName, String owner) throws RemoteException
 	{		
@@ -59,7 +83,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		else
 			return false;		
 	}
-	
+
 	@Override
 	public boolean remPermission(String server, String user, String owner) throws RemoteException {
 
@@ -72,25 +96,25 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		else	
 			return false;
 	}
-	
+
 	public String serverAddress(String server, String user) throws RemoteException {
-		
+
 		if(serversListUsers.get(server).contains(user))
 			return serversListIP.get(server).toString();
 		else
 			return null;
 	}
-	
-	
+
+
 	public static void main( String[] args) throws Exception
 	{
 		if( args.length != 0) {
 			System.out.println("Use: java trab1.ContactServer");
 			return;
 		}
-		
+
 		System.getProperties().put( "java.security.policy", "trab1/policy.all");
-		
+
 		if( System.getSecurityManager() == null) {
 			System.setSecurityManager( new RMISecurityManager());
 		}
@@ -101,7 +125,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			// if not start it
 			// do nothing - already started with rmiregistry
 		}
-		
+
 		ContactServer server = new ContactServer();
 		Naming.rebind( "/trabalhoSD", server);
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
