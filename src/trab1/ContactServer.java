@@ -1,11 +1,16 @@
 package trab1;
 
 import java.net.InetAddress;
+import java.net.URL;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.Map.Entry;
+
+import javax.xml.namespace.QName;
+
+import ws.FileServerWSService;
 
 public class ContactServer extends UnicastRemoteObject implements IContactServer {
 
@@ -25,13 +30,21 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		Iterator<Entry<String, ArrayList<String>>> iterUsers = serversListUsers.entrySet().iterator();
 		while (iterIP.hasNext())
 		{
-			iterIP.next();
+			Map.Entry<String, String> entryIP = iterIP.next();
 			Map.Entry<String, ArrayList<String>> entryUsers = iterUsers.next();
-			
+
 			try
 			{
-				IFileServer s = (IFileServer) Naming.lookup("/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
-				s.activeTest();
+				if(entryIP.getValue().startsWith("http"))
+				{
+					FileServerWSService service = new FileServerWSService( new URL( entryIP.getValue() + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWS = service.getFileServerWSPort();
+					serverWS.activeTest();
+				}
+				else{
+					IFileServer s = (IFileServer) Naming.lookup("/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
+					s.activeTest();
+				}
 			}
 			catch(Exception e)
 			{

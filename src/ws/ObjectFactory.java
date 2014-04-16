@@ -24,15 +24,17 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _PasteFileResponse_QNAME = new QName("http://trab1/", "pasteFileResponse");
     private final static QName _PasteFile_QNAME = new QName("http://trab1/", "pasteFile");
     private final static QName _Dir_QNAME = new QName("http://trab1/", "dir");
+    private final static QName _PasteFileResponse_QNAME = new QName("http://trab1/", "pasteFileResponse");
     private final static QName _GetAttr_QNAME = new QName("http://trab1/", "getAttr");
     private final static QName _RmResponse_QNAME = new QName("http://trab1/", "rmResponse");
     private final static QName _GetAttrResponse_QNAME = new QName("http://trab1/", "getAttrResponse");
     private final static QName _DirResponse_QNAME = new QName("http://trab1/", "dirResponse");
-    private final static QName _IOException_QNAME = new QName("http://trab1/", "IOException");
+    private final static QName _ActiveTestResponse_QNAME = new QName("http://trab1/", "activeTestResponse");
+    private final static QName _ActiveTest_QNAME = new QName("http://trab1/", "activeTest");
     private final static QName _Rm_QNAME = new QName("http://trab1/", "rm");
+    private final static QName _IOException_QNAME = new QName("http://trab1/", "IOException");
     private final static QName _RmdirResponse_QNAME = new QName("http://trab1/", "rmdirResponse");
     private final static QName _CopyFileResponse_QNAME = new QName("http://trab1/", "copyFileResponse");
     private final static QName _InfoNotFoundException_QNAME = new QName("http://trab1/", "InfoNotFoundException");
@@ -49,51 +51,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RmdirResponse }
+     * Create an instance of {@link InfoNotFoundException }
      * 
      */
-    public RmdirResponse createRmdirResponse() {
-        return new RmdirResponse();
-    }
-
-    /**
-     * Create an instance of {@link DirResponse }
-     * 
-     */
-    public DirResponse createDirResponse() {
-        return new DirResponse();
-    }
-
-    /**
-     * Create an instance of {@link FileInfo }
-     * 
-     */
-    public FileInfo createFileInfo() {
-        return new FileInfo();
-    }
-
-    /**
-     * Create an instance of {@link MkdirResponse }
-     * 
-     */
-    public MkdirResponse createMkdirResponse() {
-        return new MkdirResponse();
-    }
-
-    /**
-     * Create an instance of {@link CopyFileResponse }
-     * 
-     */
-    public CopyFileResponse createCopyFileResponse() {
-        return new CopyFileResponse();
-    }
-
-    /**
-     * Create an instance of {@link CopyFile }
-     * 
-     */
-    public CopyFile createCopyFile() {
-        return new CopyFile();
+    public InfoNotFoundException createInfoNotFoundException() {
+        return new InfoNotFoundException();
     }
 
     /**
@@ -105,11 +67,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PasteFile }
+     * Create an instance of {@link FileInfo }
      * 
      */
-    public PasteFile createPasteFile() {
-        return new PasteFile();
+    public FileInfo createFileInfo() {
+        return new FileInfo();
     }
 
     /**
@@ -121,11 +83,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link InfoNotFoundException }
+     * Create an instance of {@link MkdirResponse }
      * 
      */
-    public InfoNotFoundException createInfoNotFoundException() {
-        return new InfoNotFoundException();
+    public MkdirResponse createMkdirResponse() {
+        return new MkdirResponse();
+    }
+
+    /**
+     * Create an instance of {@link IOException }
+     * 
+     */
+    public IOException createIOException() {
+        return new IOException();
+    }
+
+    /**
+     * Create an instance of {@link RmdirResponse }
+     * 
+     */
+    public RmdirResponse createRmdirResponse() {
+        return new RmdirResponse();
+    }
+
+    /**
+     * Create an instance of {@link CopyFileResponse }
+     * 
+     */
+    public CopyFileResponse createCopyFileResponse() {
+        return new CopyFileResponse();
+    }
+
+    /**
+     * Create an instance of {@link PasteFile }
+     * 
+     */
+    public PasteFile createPasteFile() {
+        return new PasteFile();
     }
 
     /**
@@ -134,6 +128,38 @@ public class ObjectFactory {
      */
     public RmResponse createRmResponse() {
         return new RmResponse();
+    }
+
+    /**
+     * Create an instance of {@link CopyFile }
+     * 
+     */
+    public CopyFile createCopyFile() {
+        return new CopyFile();
+    }
+
+    /**
+     * Create an instance of {@link DirResponse }
+     * 
+     */
+    public DirResponse createDirResponse() {
+        return new DirResponse();
+    }
+
+    /**
+     * Create an instance of {@link ActiveTestResponse }
+     * 
+     */
+    public ActiveTestResponse createActiveTestResponse() {
+        return new ActiveTestResponse();
+    }
+
+    /**
+     * Create an instance of {@link ActiveTest }
+     * 
+     */
+    public ActiveTest createActiveTest() {
+        return new ActiveTest();
     }
 
     /**
@@ -153,22 +179,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetAttr }
-     * 
-     */
-    public GetAttr createGetAttr() {
-        return new GetAttr();
-    }
-
-    /**
-     * Create an instance of {@link IOException }
-     * 
-     */
-    public IOException createIOException() {
-        return new IOException();
-    }
-
-    /**
      * Create an instance of {@link Dir }
      * 
      */
@@ -177,20 +187,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link GetAttr }
+     * 
+     */
+    public GetAttr createGetAttr() {
+        return new GetAttr();
+    }
+
+    /**
      * Create an instance of {@link GetAttrResponse }
      * 
      */
     public GetAttrResponse createGetAttrResponse() {
         return new GetAttrResponse();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link PasteFileResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://trab1/", name = "pasteFileResponse")
-    public JAXBElement<PasteFileResponse> createPasteFileResponse(PasteFileResponse value) {
-        return new JAXBElement<PasteFileResponse>(_PasteFileResponse_QNAME, PasteFileResponse.class, null, value);
     }
 
     /**
@@ -209,6 +218,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://trab1/", name = "dir")
     public JAXBElement<Dir> createDir(Dir value) {
         return new JAXBElement<Dir>(_Dir_QNAME, Dir.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PasteFileResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://trab1/", name = "pasteFileResponse")
+    public JAXBElement<PasteFileResponse> createPasteFileResponse(PasteFileResponse value) {
+        return new JAXBElement<PasteFileResponse>(_PasteFileResponse_QNAME, PasteFileResponse.class, null, value);
     }
 
     /**
@@ -248,12 +266,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link IOException }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActiveTestResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://trab1/", name = "IOException")
-    public JAXBElement<IOException> createIOException(IOException value) {
-        return new JAXBElement<IOException>(_IOException_QNAME, IOException.class, null, value);
+    @XmlElementDecl(namespace = "http://trab1/", name = "activeTestResponse")
+    public JAXBElement<ActiveTestResponse> createActiveTestResponse(ActiveTestResponse value) {
+        return new JAXBElement<ActiveTestResponse>(_ActiveTestResponse_QNAME, ActiveTestResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActiveTest }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://trab1/", name = "activeTest")
+    public JAXBElement<ActiveTest> createActiveTest(ActiveTest value) {
+        return new JAXBElement<ActiveTest>(_ActiveTest_QNAME, ActiveTest.class, null, value);
     }
 
     /**
@@ -263,6 +290,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://trab1/", name = "rm")
     public JAXBElement<Rm> createRm(Rm value) {
         return new JAXBElement<Rm>(_Rm_QNAME, Rm.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link IOException }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://trab1/", name = "IOException")
+    public JAXBElement<IOException> createIOException(IOException value) {
+        return new JAXBElement<IOException>(_IOException_QNAME, IOException.class, null, value);
     }
 
     /**

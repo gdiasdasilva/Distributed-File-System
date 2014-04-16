@@ -117,6 +117,9 @@ public class FileServerWS implements IFileServerWS {
 			return null;
 		}
 	}
+	
+	@WebMethod
+	public void activeTest() {}
 
 	public static void main( String[] args) throws Exception
 	{
@@ -144,7 +147,9 @@ public class FileServerWS implements IFileServerWS {
 			}
 			catch( Throwable th) 
 			{
-				th.printStackTrace();
+				// Se tivermos este print sempre activo cada vez que tentamos iniciar um novo WS ele faz o
+				// print da stack trace
+				//th.printStackTrace();
 				port++;
 			}
 

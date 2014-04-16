@@ -137,4 +137,12 @@ public interface FileServerWS {
         throws IOException_Exception
     ;
 
+    /**
+     * 
+     */
+    @WebMethod
+    @RequestWrapper(localName = "activeTest", targetNamespace = "http://trab1/", className = "ws.ActiveTest")
+    @ResponseWrapper(localName = "activeTestResponse", targetNamespace = "http://trab1/", className = "ws.ActiveTestResponse")
+    public void activeTest();
+
 }

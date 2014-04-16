@@ -154,8 +154,12 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		System.out.println("FileServer RMI running in " + ip + " ...");
 
+		try{
 		IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
 		Naming.rebind( "/" + serverName + "@" + userName, server);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 
 		register(serverName, contactServerUrl, userName, ip);
 	}

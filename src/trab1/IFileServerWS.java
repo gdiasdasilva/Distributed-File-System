@@ -61,5 +61,10 @@ public interface IFileServerWS
 	 */
 	public byte[] copyFile(String fromPath) throws IOException;
 	
+	/**
+	 * 
+	 */
+	public void activeTest();
+	
 
 }
