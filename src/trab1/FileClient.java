@@ -481,18 +481,24 @@ public class FileClient
 
 				int port = 5000;
 				String group = "225.4.5.6";
-				MulticastSocket s = new MulticastSocket(port);
-				s.joinGroup(InetAddress.getByName(group));
 
-				byte buf[] = new byte[1024];
-				DatagramPacket pack = new DatagramPacket(buf, buf.length);
-				s.receive(pack);
+				try{
+					MulticastSocket s = new MulticastSocket(port);
+					s.joinGroup(InetAddress.getByName(group));
 
-				String contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+					byte buf[] = new byte[1024];
+					DatagramPacket pack = new DatagramPacket(buf, buf.length);
+					s.receive(pack);
 
-				s.leaveGroup(InetAddress.getByName(group));
-				s.close();
-				new FileClient(contactServerUrl, args[0]).doit();
+					String contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+					s.leaveGroup(InetAddress.getByName(group));
+					s.close();
+					new FileClient(contactServerUrl, args[0]).doit();
+				} 
+				catch(Exception e){
+
+				}
 			}
 
 			else

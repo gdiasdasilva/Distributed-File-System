@@ -121,7 +121,7 @@ public class FileServerWS implements IFileServerWS {
 			return null;
 		}
 	}
-	
+
 	@WebMethod
 	public void activeTest() {}
 
@@ -134,11 +134,11 @@ public class FileServerWS implements IFileServerWS {
 		}
 
 		String serverName = args[0];
-		String contactServerUrl;
-		String userName;
+		String contactServerUrl = "";
+		String userName = "";
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		int port = 8080;
-		
+
 		if (args.length == 3)
 		{
 			contactServerUrl = args[1];
@@ -152,20 +152,26 @@ public class FileServerWS implements IFileServerWS {
 
 			int portMulticast = 5000;
 			String group = "225.4.5.6";
-			MulticastSocket s = new MulticastSocket(portMulticast);
-			s.joinGroup(InetAddress.getByName(group));
-			
-			byte buf[] = new byte[1024];
-			DatagramPacket pack = new DatagramPacket(buf, buf.length);
-			s.receive(pack);
-			
-			contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
 
-			s.leaveGroup(InetAddress.getByName(group));
-			s.close();
+			try{
+				MulticastSocket s = new MulticastSocket(portMulticast);
+				s.joinGroup(InetAddress.getByName(group));
+
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.receive(pack);
+
+				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+			} 
+			catch(Exception e){
+
+			}
 		}
 
-		
+
 		for (;;)
 		{
 			try

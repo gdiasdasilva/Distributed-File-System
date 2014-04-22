@@ -138,8 +138,8 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 		String serverName = args[0];	
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
-		String contactServerUrl;
-		String userName;
+		String contactServerUrl = "";
+		String userName = "";
 
 		if (args.length == 3)
 		{
@@ -154,17 +154,24 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 			int port = 5000;
 			String group = "225.4.5.6";
-			MulticastSocket s = new MulticastSocket(port);
-			s.joinGroup(InetAddress.getByName(group));
-			
-			byte buf[] = new byte[1024];
-			DatagramPacket pack = new DatagramPacket(buf, buf.length);
-			s.receive(pack);
-			
-			contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
 
-			s.leaveGroup(InetAddress.getByName(group));
-			s.close();
+			try{
+
+				MulticastSocket s = new MulticastSocket(port);
+				s.joinGroup(InetAddress.getByName(group));
+
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.receive(pack);
+
+				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+			} 
+			catch(Exception e){
+
+			}
 		}
 
 		try
@@ -178,7 +185,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		}
 
 		register(serverName, contactServerUrl, userName, ip);
-			
+
 		System.out.println("FileServer RMI running in " + ip + " ...");
 	}
 
