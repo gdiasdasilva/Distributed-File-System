@@ -43,9 +43,8 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 				}
 				else
 				{
-					System.out.println(entryUsers.getKey());
-					System.out.println(entryUsers.getValue().get(0));
-					IFileServer s = (IFileServer) Naming.lookup("/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
+					String tmp = entryIP.getValue();
+					IFileServer s = (IFileServer) Naming.lookup("//"  + tmp + "/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
 					s.activeTest();
 				}
 			}
