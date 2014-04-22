@@ -2,6 +2,7 @@ package trab1;
 
 import java.io.*;
 import java.net.*;
+import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.*;
@@ -20,7 +21,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		this.userName = userName;
 		this.ip = ip;
 	}
-	
+
 	@Override
 	public void activeTest() throws RemoteException{}
 
@@ -133,13 +134,36 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			// do nothing - already started with rmiregistry
 		}
 
-		String serverName = args[0];
-		String contactServerUrl = args[1];
-		String userName = args[2];
+		String serverName = args[0];	
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
-		
-		// Call multicast client to get ip
-		
+		String contactServerUrl;
+		String userName;
+
+		if (args.length == 3)
+		{
+			contactServerUrl = args[1];
+			userName = args[2];
+		}
+		else
+		{
+			userName = args[1];
+
+			// Call multicast client to get contact server ip
+
+			int port = 5000;
+			String group = "225.4.5.6";
+			MulticastSocket s = new MulticastSocket(port);
+			s.joinGroup(InetAddress.getByName(group));
+			
+			byte buf[] = new byte[1024];
+			DatagramPacket pack = new DatagramPacket(buf, buf.length);
+			s.receive(pack);
+			
+			contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+			s.leaveGroup(InetAddress.getByName(group));
+			s.close();
+		}
 
 		try
 		{
@@ -148,9 +172,9 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		}
 		catch(Exception e)
 		{
-			
+
 		}
-		
+
 		register(serverName, contactServerUrl, userName, ip);
 		System.out.println("FileServer RMI running in " + ip + " ...");
 	}
