@@ -1,6 +1,7 @@
 package trab1;
 
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
@@ -120,7 +121,6 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			return null;
 	}
 
-
 	public static void main( String[] args) throws Exception
 	{
 		if( args.length != 0) {
@@ -145,6 +145,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		Naming.rebind( "/trabalhoSD", server);
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		System.out.println( "ContactServer running in " + ip + " ...");
+	    
+	    new Thread(new MulticastServer()).start();
 	}
-
 }

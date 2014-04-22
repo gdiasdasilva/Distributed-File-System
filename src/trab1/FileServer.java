@@ -1,26 +1,14 @@
 package trab1;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
+import java.io.*;
+import java.net.*;
+import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.*;
 import java.util.Date;
 
 public class FileServer extends UnicastRemoteObject implements IFileServer {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String serverName, contactServerUrl, userName, ip;
 	private static String basePath = ".";
@@ -129,17 +117,14 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		} catch (FileNotFoundException e) {
 			return null;
 		}
-
 	}
 
 	public static void main( String[] args) throws Exception
 	{
-		if( args.length != 3) {
+		if( args.length != 3 && args.length != 2){
 			System.out.println("Use: java trab1.FileServer serverName contactServerURL userName");
 			return;
 		}
-
-		/* sera que e preciso isto aqui em baixo ?! */
 
 		try { // start rmiregistry
 			LocateRegistry.createRegistry( 1099);
@@ -152,16 +137,22 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		String contactServerUrl = args[1];
 		String userName = args[2];
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
-		System.out.println("FileServer RMI running in " + ip + " ...");
+		
+		// Call multicast client to get ip
+		
 
-		try{
-		IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
-		Naming.rebind( "/" + serverName + "@" + userName, server);
-		}catch(Exception e){
-			e.printStackTrace();
+		try
+		{
+			IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
+			Naming.rebind( "/" + serverName + "@" + userName, server);
 		}
-
+		catch(Exception e)
+		{
+			
+		}
+		
 		register(serverName, contactServerUrl, userName, ip);
+		System.out.println("FileServer RMI running in " + ip + " ...");
 	}
 
 }
