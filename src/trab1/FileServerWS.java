@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.util.Date;
 
@@ -123,17 +125,44 @@ public class FileServerWS implements IFileServerWS {
 
 	public static void main( String[] args) throws Exception
 	{
-		if( args.length != 3)
+		if( args.length != 3 && args.length != 2)
 		{
 			System.out.println("Use: java trab1.FileServerWS serverName contactServerURL userName");
 			return;
 		}
 
 		String serverName = args[0];
-		String contactServerUrl = args[1];
-		String userName = args[2];
+		String contactServerUrl;
+		String userName;
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		int port = 8080;
+		
+		if (args.length == 3)
+		{
+			contactServerUrl = args[1];
+			userName = args[2];
+		}
+		else
+		{
+			userName = args[1];
+
+			// Call multicast client to get contact server ip
+
+			int portMulticast = 5000;
+			String group = "225.4.5.6";
+			MulticastSocket s = new MulticastSocket(portMulticast);
+			s.joinGroup(InetAddress.getByName(group));
+			
+			byte buf[] = new byte[1024];
+			DatagramPacket pack = new DatagramPacket(buf, buf.length);
+			s.receive(pack);
+			
+			contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+			s.leaveGroup(InetAddress.getByName(group));
+			s.close();
+		}
+
 		
 		for (;;)
 		{

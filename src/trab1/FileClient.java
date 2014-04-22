@@ -2,6 +2,9 @@ package trab1;
 
 import java.io.*;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -138,7 +141,7 @@ public class FileClient
 			}
 			else
 				return false;
-			
+
 		}
 		catch (Exception e)
 		{
@@ -332,7 +335,8 @@ public class FileClient
 					for( int i = 0; i < s.length; i++)
 						System.out.println( s[i]);
 				}
-			} else if( cmd[0].equalsIgnoreCase("addPermission")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("addPermission")) {
 				String server = cmd[1];
 				String user = cmd[2];
 
@@ -342,7 +346,8 @@ public class FileClient
 					System.out.println( "success");
 				else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("remPermission")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("remPermission")) {
 				String server = cmd[1];
 				String user = cmd[2];
 
@@ -352,7 +357,8 @@ public class FileClient
 					System.out.println( "success");
 				else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("ls")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("ls")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
 
@@ -367,7 +373,8 @@ public class FileClient
 						System.out.println( res[i]);
 				} else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("mkdir")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("mkdir")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
 
@@ -380,7 +387,8 @@ public class FileClient
 					System.out.println( "success");
 				else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("rmdir")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("rmdir")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
 
@@ -393,7 +401,8 @@ public class FileClient
 					System.out.println( "success");
 				else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("rm")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("rm")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
 
@@ -405,8 +414,9 @@ public class FileClient
 				if( b)
 					System.out.println( "success");
 				else
-					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("getattr")) {
+					System.out.println( "error");	
+			} 
+			else if( cmd[0].equalsIgnoreCase("getattr")) {
 				String[] dirserver = cmd[1].split(":");
 				String[] serveruser = dirserver[0].split("@");
 
@@ -420,7 +430,8 @@ public class FileClient
 					System.out.println( "success");
 				} else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("cp")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("cp")) {
 				String[] dirserver1 = cmd[1].split(":");
 				String[] serveruser1 = dirserver1[0].split("@");
 
@@ -440,7 +451,8 @@ public class FileClient
 					System.out.println( "success");
 				else
 					System.out.println( "error");
-			} else if( cmd[0].equalsIgnoreCase("help")) {
+			} 
+			else if( cmd[0].equalsIgnoreCase("help")) {
 				System.out.println("servers - lista URLs dos servidores a que tem acesso");
 				System.out.println("addPermission server user - adiciona user a lista de utilizadores com permissoes para aceder a server");
 				System.out.println("remPermission server user - remove user da lista de utilizadores com permissoes para aceder a server");
@@ -457,19 +469,41 @@ public class FileClient
 	}
 
 	public static void main( String[] args) throws Exception {
-		if( args.length != 2) {
+		if( args.length != 2 && args.length != 1) {
 			System.out.println("Use: java trab1.FileClient URL nome_utilizador");
 			return;
 		}
+
 		try {
-			new FileClient( args[0], args[1]).doit();
+			if(args.length == 1){
+
+				// Call multicast client to get contact server ip
+
+				int port = 5000;
+				String group = "225.4.5.6";
+				MulticastSocket s = new MulticastSocket(port);
+				s.joinGroup(InetAddress.getByName(group));
+
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.receive(pack);
+
+				String contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+				new FileClient(contactServerUrl, args[0]).doit();
+			}
+
+			else
+				new FileClient( args[0], args[1]).doit();
 		} catch (IOException e) {
 			System.err.println("Error:" + e.getMessage());
 			e.printStackTrace();
 		}
-		
-		
-		
+
+
+
 	}
 
 }
