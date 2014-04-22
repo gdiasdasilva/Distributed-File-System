@@ -50,7 +50,6 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
 				iterIP.remove();
 				iterUsers.remove();
 			}

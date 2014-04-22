@@ -50,7 +50,6 @@ public class FileClient
 		try {
 			return cs.addPermission(server, user, username);
 		} catch (RemoteException e) {
-			System.out.println("Nao foi possivel adicionar a permissao.");
 			return false;
 		}
 	}
@@ -66,7 +65,6 @@ public class FileClient
 		try {
 			return cs.remPermission(server, user, username);
 		} catch (RemoteException e) {
-			System.out.println("Nao foi possivel remover a permissao.");
 			return false;
 		}
 	}
@@ -101,13 +99,11 @@ public class FileClient
 				}				
 			}
 			else{
-				System.out.println("Endereço incorrecto");
 				return null;
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel listar a directoria.");
 			return null;
 		}
 	}
@@ -141,14 +137,11 @@ public class FileClient
 				}
 			}
 			else
-			{
-				System.out.println("Endereço incorrecto");
 				return false;
-			}
+			
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel criar a directoria.");
 			return false;
 		}
 	}
@@ -160,7 +153,7 @@ public class FileClient
 	 * NOTA: não deve lançar excepcao. 
 	 */
 	protected boolean rmdir( String server, String user, String dir) {
-		System.err.println( "exec: mkdir " + dir + " no servidor " + server + "@" + user);
+		System.err.println( "exec: rmdir " + dir + " no servidor " + server + "@" + user);
 
 		try
 		{
@@ -181,13 +174,11 @@ public class FileClient
 				}
 			}
 			else{
-				System.out.println("Endereço incorrecto");
 				return false;
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel remover a directoria.");
 			return false;
 		}
 	}
@@ -220,13 +211,11 @@ public class FileClient
 				}
 			}
 			else{
-				System.out.println("Endereço incorrecto");
 				return false;
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel remover o ficheiro.");
 			return false;
 		}
 	}
@@ -260,13 +249,11 @@ public class FileClient
 				}
 			}
 			else{
-				System.out.println("Endereço incorrecto");
 				return null;
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel obter a informacao sobre o ficheiro.");
 			return null;
 		}
 	}
@@ -318,13 +305,11 @@ public class FileClient
 			}
 			else
 			{
-				System.out.println("Endereço incorrecto");
 				return false;
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Nao foi possivel copiar o ficheiro.");
 			return false;
 		}
 	}
