@@ -26,7 +26,8 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 	}	
 
 	public void clearUnavailableServers() throws RemoteException
-	{	// Feito com iteradores por causa da ConcurrentModificationException
+	{	
+		// Feito com iteradores por causa da ConcurrentModificationException
 		Iterator<Map.Entry<String,String>> iterIP = serversListIP.entrySet().iterator();
 		Iterator<Entry<String, ArrayList<String>>> iterUsers = serversListUsers.entrySet().iterator();
 		while (iterIP.hasNext())
@@ -57,7 +58,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		}
 	}
 
-	public void registerServer(String serverName, String serverIP, String userName) throws RemoteException
+	public boolean registerServer(String serverName, String serverIP, String userName) throws RemoteException
 	{		
 		if(!serversListUsers.containsKey(serverName))
 		{
@@ -65,7 +66,10 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 			ArrayList<String> users = new ArrayList<String>();
 			users.add(userName);
 			serversListUsers.put(serverName, users);
+			return true;
 		}
+		else
+			return false;
 	}
 
 	/**

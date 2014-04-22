@@ -18,7 +18,7 @@ public interface IContactServer extends Remote {
 	 * @param serverIP
 	 * @param userName
 	 */
-	public void registerServer(String serverName, String serverIP, String userName) throws RemoteException;
+	public boolean registerServer(String serverName, String serverIP, String userName) throws RemoteException;
 	
 	/**
 	 * Metodo para adicionar permissao de acesso de um utilizador a um servidor.

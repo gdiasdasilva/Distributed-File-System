@@ -38,7 +38,9 @@ public class FileServerWS implements IFileServerWS {
 		try
 		{
 			server = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
-			server.registerServer(serverName, ip, userName);
+			boolean success = server.registerServer(serverName, ip, userName);
+			if(!success)
+				System.exit(0);
 		} 
 		catch (Exception e) 
 		{

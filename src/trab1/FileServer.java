@@ -32,7 +32,9 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		try
 		{
 			server = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
-			server.registerServer(serverName, ip, userName);
+			boolean success = server.registerServer(serverName, ip, userName);
+			if(!success)
+				System.exit(0);
 		} 
 		catch (Exception e) 
 		{
@@ -176,6 +178,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		}
 
 		register(serverName, contactServerUrl, userName, ip);
+			
 		System.out.println("FileServer RMI running in " + ip + " ...");
 	}
 
