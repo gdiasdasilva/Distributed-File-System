@@ -38,7 +38,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		} 
 		catch (Exception e) 
 		{
-			System.out.println("Erro ao fazer o lookup do Contact Server.");
+			System.out.println("Contact Server nao encontrado no endereco suposto");
 		}		
 	}
 
@@ -51,7 +51,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		if(f.exists())
 			return f.list();
 		else
-			throw new InfoNotFoundException("Directory not found: " + dir);
+			throw new InfoNotFoundException("Directoria nao encontrada: " + dir);
 	}
 
 	@Override
@@ -102,6 +102,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			return true;
 
 		} catch(Exception e){
+			System.out.println("Erro na gravacao do ficheiro");
 			return false;
 		}
 	}
@@ -118,6 +119,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			input.close();
 			return buffer;
 		} catch (FileNotFoundException e) {
+			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
 			return null;
 		}
 	}
@@ -169,8 +171,9 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 				s.leaveGroup(InetAddress.getByName(group));
 				s.close();
 			} 
-			catch(Exception e){
-
+			catch(Exception e)
+			{
+				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
 			}
 		}
 
@@ -181,7 +184,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		}
 		catch(Exception e)
 		{
-
+			System.out.println("Erro ao criar FileServer");
 		}
 
 		register(serverName, contactServerUrl, userName, ip);
