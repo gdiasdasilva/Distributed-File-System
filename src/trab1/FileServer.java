@@ -36,6 +36,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			if(!success)
 				System.exit(0);
 		} 
+		// falta caso o url esteja mal
 		catch (Exception e) 
 		{
 			System.out.println("Contact Server nao encontrado no endereco suposto");
@@ -98,8 +99,10 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			OutputStream out = new FileOutputStream(file);
 			out.write(f);
 			out.close();
-
 			return true;
+			
+			// falta io exception
+			// not found exception	
 
 		} catch(Exception e){
 			System.out.println("Erro na gravacao do ficheiro");
@@ -118,6 +121,10 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			input.read(buffer);
 			input.close();
 			return buffer;
+			
+			// falta io exception
+			// not found exception	
+			
 		} catch (FileNotFoundException e) {
 			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
 			return null;

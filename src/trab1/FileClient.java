@@ -102,11 +102,13 @@ public class FileClient
 				}				
 			}
 			else{
+				// dizer que o endereço nao era valido
 				return null;
 			}
 		}
 		catch (Exception e)
 		{
+			// Deviamos dividr este try catch em 2 para sabermos quando o erro e de RMI e quando e de WS
 			return null;
 		}
 	}
@@ -497,7 +499,7 @@ public class FileClient
 					new FileClient(contactServerUrl, args[0]).doit();
 				} 
 				catch(Exception e){
-
+// Erro de multicast
 				}
 			}
 
