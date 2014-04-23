@@ -53,6 +53,7 @@ public class FileClient
 		try {
 			return cs.addPermission(server, user, username);
 		} catch (RemoteException e) {
+			System.out.println("Não foi possivel adicionar a permissão");
 			return false;
 		}
 	}
@@ -68,6 +69,7 @@ public class FileClient
 		try {
 			return cs.remPermission(server, user, username);
 		} catch (RemoteException e) {
+			System.out.println("Não foi possivel remover a permissão");
 			return false;
 		}
 	}
@@ -102,7 +104,7 @@ public class FileClient
 				}				
 			}
 			else{
-				// dizer que o endereço nao era valido
+				System.out.println("Url do servidor inválido");
 				return null;
 			}
 		}
@@ -151,9 +153,10 @@ public class FileClient
 					return fs.mkdir(dir);
 				}
 			}
-			else
+			else{
+				System.out.println("Url do servidor inválido");
 				return false;
-
+			}
 		}
 		catch (Exception e)
 		{
@@ -190,6 +193,7 @@ public class FileClient
 				}
 			}
 			else{
+				System.out.println("Url do servidor inválido");
 				return false;
 			}
 		}
@@ -228,6 +232,7 @@ public class FileClient
 				}
 			}
 			else{
+				System.out.println("Url do servidor inválido");
 				return false;
 			}
 		}
@@ -267,6 +272,7 @@ public class FileClient
 				}
 			}
 			else{
+				System.out.println("Url do servidor inválido");
 				return null;
 			}
 		}
@@ -321,7 +327,8 @@ public class FileClient
 
 				String[] tmpTo = toAddress.split(":");
 
-				if(tmpTo[0].equals("http")){
+				if(tmpTo[0].equals("http"))
+				{
 					FileServerWSService serviceTo = new FileServerWSService( new URL( toAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
 					ws.FileServerWS serverWSTo = serviceTo.getFileServerWSPort();
 					return serverWSTo.pasteFile(bf, toPath);
@@ -334,6 +341,7 @@ public class FileClient
 			}
 			else
 			{
+				System.out.println("Url do servidor inválido");
 				return false;
 			}
 		}
@@ -534,7 +542,7 @@ public class FileClient
 					new FileClient(contactServerUrl, args[0]).doit();
 				} 
 				catch(Exception e){
-// Erro de multicast
+					System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
 				}
 			}
 

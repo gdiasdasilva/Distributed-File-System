@@ -104,6 +104,7 @@ public class FileServerWS implements IFileServerWS {
 			return true;
 
 		} catch(Exception e){
+			System.out.println("Erro na gravacao do ficheiro");
 			return false;
 		}
 	}
@@ -118,6 +119,7 @@ public class FileServerWS implements IFileServerWS {
 			input.close();
 			return buffer;
 		} catch (FileNotFoundException e) {
+			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
 			return null;
 		}
 	}
