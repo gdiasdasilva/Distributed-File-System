@@ -106,9 +106,19 @@ public class FileClient
 				return null;
 			}
 		}
+		catch(InfoNotFoundException e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return null;
+		}
+		catch(InfoNotFoundException_Exception e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return null;
+		}
 		catch (Exception e)
 		{
-			// Deviamos dividr este try catch em 2 para sabermos quando o erro e de RMI e quando e de WS
+			System.out.println("Problema no acesso ao servidor");
 			return null;
 		}
 	}
@@ -147,6 +157,7 @@ public class FileClient
 		}
 		catch (Exception e)
 		{
+			System.out.println("Problema no acesso ao servidor");
 			return false;
 		}
 	}
@@ -184,6 +195,7 @@ public class FileClient
 		}
 		catch (Exception e)
 		{
+			System.out.println("Problema no acesso ao servidor");
 			return false;
 		}
 	}
@@ -221,6 +233,7 @@ public class FileClient
 		}
 		catch (Exception e)
 		{
+			System.out.println("Problema no acesso ao servidor");
 			return false;
 		}
 	}
@@ -257,8 +270,19 @@ public class FileClient
 				return null;
 			}
 		}
+		catch(InfoNotFoundException e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return null;
+		}
+		catch(InfoNotFoundException_Exception e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return null;
+		}
 		catch (Exception e)
 		{
+			System.out.println("Problema no acesso ao servidor");
 			return null;
 		}
 	}
@@ -313,8 +337,19 @@ public class FileClient
 				return false;
 			}
 		}
+		catch(IOException e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return false;
+		}
+		catch(IOException_Exception e)
+		{
+			System.out.println("Directoria nao encontrada");
+			return false;
+		}
 		catch (Exception e)
 		{
+			System.out.println("Problema no acesso ao servidor");
 			return false;
 		}
 	}

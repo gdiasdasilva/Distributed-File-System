@@ -36,7 +36,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			if(!success)
 				System.exit(0);
 		} 
-		// falta caso o url esteja mal
 		catch (Exception e) 
 		{
 			System.out.println("Contact Server nao encontrado no endereco suposto");
@@ -46,9 +45,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
 	RemoteException {
-
 		File f = new File(new File(basePath), dir);
-
 		if(f.exists())
 			return f.list();
 		else
@@ -57,7 +54,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 	@Override
 	public boolean mkdir(String dir) throws RemoteException {
-
 		File m = new File(new File(basePath), dir);
 		return m.mkdir();
 	}
@@ -73,7 +69,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 	@Override
 	public boolean rm(String dir) throws RemoteException {
-
 		File f = new File(new File(basePath), dir);
 		if (f.isFile())
 			return f.delete();
@@ -93,17 +88,12 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	@Override
 	public boolean pasteFile(byte[] f, String toPath)
 			throws RemoteException, IOException {
-
 		try{
 			File file = new File(basePath, toPath);
 			OutputStream out = new FileOutputStream(file);
 			out.write(f);
 			out.close();
 			return true;
-			
-			// falta io exception
-			// not found exception	
-
 		} catch(Exception e){
 			System.out.println("Erro na gravacao do ficheiro");
 			return false;
@@ -113,7 +103,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	@Override
 	public byte[] copyFile(String fromPath)
 			throws IOException {
-
 		try {
 			File f = new File(basePath, fromPath);
 			InputStream input = new FileInputStream(f);
@@ -121,10 +110,6 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			input.read(buffer);
 			input.close();
 			return buffer;
-			
-			// falta io exception
-			// not found exception	
-			
 		} catch (FileNotFoundException e) {
 			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
 			return null;

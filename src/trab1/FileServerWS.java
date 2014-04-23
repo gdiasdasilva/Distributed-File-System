@@ -167,7 +167,7 @@ public class FileServerWS implements IFileServerWS {
 				s.close();
 			} 
 			catch(Exception e){
-// falta especificar
+				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
 			}
 		}
 
