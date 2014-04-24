@@ -18,8 +18,9 @@ import javax.xml.ws.Endpoint;
 
 @WebService
 public class FileServerWS implements IFileServerWS {
-
+	@SuppressWarnings("unused")
 	private String serverName, contactServerUrl, userName, ip;
+	@SuppressWarnings("unused")
 	private int port;
 	private static String basePath = ".";
 

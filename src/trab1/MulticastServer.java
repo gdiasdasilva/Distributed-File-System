@@ -8,6 +8,7 @@ public class MulticastServer implements Runnable {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run()
 	{

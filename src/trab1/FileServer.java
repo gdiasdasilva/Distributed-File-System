@@ -2,7 +2,6 @@ package trab1;
 
 import java.io.*;
 import java.net.*;
-import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.*;
@@ -11,6 +10,7 @@ import java.util.Date;
 public class FileServer extends UnicastRemoteObject implements IFileServer {
 
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private String serverName, contactServerUrl, userName, ip;
 	private static String basePath = ".";
 
@@ -54,13 +54,13 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	}
 
 	@Override
-	public boolean mkdir(String dir) throws RemoteException {
+	public synchronized boolean mkdir(String dir) throws RemoteException {
 		File m = new File(new File(basePath), dir);
 		return m.mkdir();
 	}
 
 	@Override
-	public boolean rmdir(String dir) throws RemoteException {
+	public synchronized boolean rmdir(String dir) throws RemoteException {
 		File r = new File(new File(basePath), dir);
 		if (r.isDirectory() && r.list().length == 0)
 			return r.delete();
@@ -69,7 +69,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	}
 
 	@Override
-	public boolean rm(String dir) throws RemoteException {
+	public synchronized boolean rm(String dir) throws RemoteException {
 		File f = new File(new File(basePath), dir);
 		if (f.isFile())
 			return f.delete();
@@ -87,7 +87,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 	}
 
 	@Override
-	public boolean pasteFile(byte[] f, String toPath)
+	public synchronized boolean pasteFile(byte[] f, String toPath)
 			throws RemoteException, IOException {
 		try{
 			File file = new File(basePath, toPath);

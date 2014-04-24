@@ -1,7 +1,6 @@
 package trab1;
 
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
@@ -58,7 +57,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		}
 	}
 
-	public boolean registerServer(String serverName, String serverIP, String userName) throws RemoteException
+	public synchronized boolean registerServer(String serverName, String serverIP, String userName) throws RemoteException
 	{		
 		if(!serversListUsers.containsKey(serverName))
 		{

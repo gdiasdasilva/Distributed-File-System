@@ -519,42 +519,40 @@ public class FileClient
 			return;
 		}
 
-		try {
-			if(args.length == 1){
+		if(args.length == 1)
+		{
+			int port = 5000;
+			String group = "225.4.5.6";
 
-				// Call multicast client to get contact server ip
+			try
+			{   // Call multicast client to get contact server ip
+				MulticastSocket s = new MulticastSocket(port);
+				s.joinGroup(InetAddress.getByName(group));
 
-				int port = 5000;
-				String group = "225.4.5.6";
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.setSoTimeout(2000); 
+				s.receive(pack);
 
-				try{
-					MulticastSocket s = new MulticastSocket(port);
-					s.joinGroup(InetAddress.getByName(group));
+				String contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
 
-					byte buf[] = new byte[1024];
-					DatagramPacket pack = new DatagramPacket(buf, buf.length);
-					s.receive(pack);
-
-					String contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
-
-					s.leaveGroup(InetAddress.getByName(group));
-					s.close();
-					new FileClient(contactServerUrl, args[0]).doit();
-				} 
-				catch(Exception e){
-					System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
-				}
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+				FileClient fc = new FileClient(contactServerUrl, args[0]);
+				fc.doit();
 			}
-
-			else
-				new FileClient( args[0], args[1]).doit();
-		} catch (IOException e) {
-			System.err.println("Error:" + e.getMessage());
-			e.printStackTrace();
+			catch(ArrayIndexOutOfBoundsException e)
+			{
+				System.out.println("Erro no comando");
+			}
+			catch(Exception e)
+			{
+				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
+				System.exit(0);
+			}
 		}
-
-
-
+		else
+			new FileClient(args[0], args[1]).doit();
 	}
 
 }
