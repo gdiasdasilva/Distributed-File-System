@@ -1,5 +1,11 @@
 package trab1;
 
+/**
+ * SD 13/14 - Trabalho pratico 1
+ * Gonçalo Dias da Silva: 41831
+ * Joao Francisco Pinto: 41887
+ */
+
 import java.io.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
