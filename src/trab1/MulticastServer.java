@@ -31,7 +31,7 @@ public class MulticastServer implements Runnable {
 		}
 		catch(Exception e)
 		{
-			System.out.println("Erro ao enviar IP por multicast!");
+			System.out.println("Erro ao enviar IP por multicast. Falha de rede.");
 		}
 	}
 }

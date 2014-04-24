@@ -38,7 +38,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		} 
 		catch (Exception e) 
 		{
-			System.out.println("Contact Server nao encontrado no endereco suposto");
+			System.out.println("Contact Server nao encontrado no endereco fornecido");
 			System.exit(0);
 		}		
 	}
