@@ -45,6 +45,7 @@ public class FileServerWS implements IFileServerWS {
 		catch (Exception e) 
 		{
 			System.out.println("Erro ao fazer o lookup do Contact Server.");
+			System.exit(0);
 		}		
 	}
 
@@ -161,6 +162,7 @@ public class FileServerWS implements IFileServerWS {
 
 				byte buf[] = new byte[1024];
 				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.setSoTimeout(2000); 
 				s.receive(pack);
 
 				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
@@ -170,9 +172,9 @@ public class FileServerWS implements IFileServerWS {
 			} 
 			catch(Exception e){
 				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
+				System.exit(0);
 			}
 		}
-
 
 		for (;;)
 		{
@@ -181,18 +183,15 @@ public class FileServerWS implements IFileServerWS {
 				Endpoint.publish(
 						"http://" + ip + ":" + port + "/FileServer",
 						new FileServerWS(serverName, contactServerUrl, userName, ip, port));
-				System.out.println("FileServer WS running in " + ip + ":" + port + " ...");
 				break;
 			}
 			catch( Throwable th) 
 			{
-				// Se tivermos este print sempre activo cada vez que tentamos iniciar um novo WS ele faz o
-				// print da stack trace
-				//th.printStackTrace();
 				port++;
 			}
-
 		}
+		
 		register(serverName, contactServerUrl, userName, "http://" + ip + ":" + port);
+		System.out.println("FileServer WS running in " + ip + ":" + port + " ...");
 	}
 }

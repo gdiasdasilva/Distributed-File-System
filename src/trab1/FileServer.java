@@ -39,6 +39,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		catch (Exception e) 
 		{
 			System.out.println("Contact Server nao encontrado no endereco suposto");
+			System.exit(0);
 		}		
 	}
 
@@ -134,11 +135,13 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		String contactServerUrl = "";
 		String userName = "";
+		int flag = 0;
 
 		if (args.length == 3)
 		{
 			contactServerUrl = args[1];
 			userName = args[2];
+			flag++;
 		}
 		else
 		{
@@ -150,22 +153,24 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 			String group = "225.4.5.6";
 
 			try{
-
 				MulticastSocket s = new MulticastSocket(port);
 				s.joinGroup(InetAddress.getByName(group));
 
 				byte buf[] = new byte[1024];
 				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.setSoTimeout(2000); 
 				s.receive(pack);
 
 				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
 
 				s.leaveGroup(InetAddress.getByName(group));
 				s.close();
+				flag++;
 			} 
 			catch(Exception e)
 			{
 				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
+				System.exit(0);
 			}
 		}
 
@@ -173,15 +178,19 @@ public class FileServer extends UnicastRemoteObject implements IFileServer {
 		{
 			IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
 			Naming.rebind( "/" + serverName + "@" + userName, server);
+			flag++;
 		}
 		catch(Exception e)
 		{
 			System.out.println("Erro ao criar FileServer");
+			System.exit(0);
 		}
 
-		register(serverName, contactServerUrl, userName, ip);
-
-		System.out.println("FileServer RMI running in " + ip + " ...");
+		if(flag == 2)
+		{
+			register(serverName, contactServerUrl, userName, ip);
+			System.out.println("FileServer RMI running in " + ip + " ...");
+		}
 	}
 
 }
