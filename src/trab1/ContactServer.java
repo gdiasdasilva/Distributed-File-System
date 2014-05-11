@@ -56,7 +56,7 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 						s.activeTest();					
 					}
 					catch(Exception e){
-						IProxyDropbox sdrop = (IProxyDropbox) Naming.lookup("//"  + tmp + "/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
+						IProxyRest sdrop = (IProxyRest) Naming.lookup("//"  + tmp + "/" + entryUsers.getKey() + "@" + entryUsers.getValue().get(0));
 						sdrop.activeTest();
 					}
 				}

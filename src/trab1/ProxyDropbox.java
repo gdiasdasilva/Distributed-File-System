@@ -26,7 +26,7 @@ import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 import org.json.simple.parser.ParseException;
 
-public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
+public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
@@ -62,7 +62,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 	@Override
 	public void activeTest() throws RemoteException{}
 
-	public static void register (String serverName, String contactServerURL, String userName, String ip)
+	private static void register (String serverName, String contactServerURL, String userName, String ip)
 	{
 		IContactServer server;
 
@@ -256,14 +256,16 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 					.apiSecret(API_SECRET).scope(SCOPE).build();
 			Scanner in = new Scanner(System.in);
 			Token requestToken = service.getRequestToken();
+			
 			System.out.println("Tem de obter autorizacao para a aplicacao continuar acedendo ao link:");
 			System.out.println(AUTHORIZE_URL + requestToken.getToken());
 			System.out.println("E carregar em enter quando der autorizacao");
 			System.out.print(">>");
+			
 			Verifier verifier = new Verifier(in.nextLine());
 			verifier = new Verifier(requestToken.getSecret());
 			Token accessToken = service.getAccessToken(requestToken, verifier);	
-			IProxyDropbox server = new ProxyDropbox(service, accessToken);
+			IProxyRest server = new ProxyDropbox(service, accessToken);
 			Naming.rebind( "/" + serverName + "@" + userName, server);
 			flag++;
 		}

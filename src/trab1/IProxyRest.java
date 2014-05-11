@@ -9,7 +9,7 @@ package trab1;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IProxyDropbox extends Remote{
+public interface IProxyRest extends Remote{
 	
 	/**
 	 * Metodo criado para a listagem de uma directoria.
