@@ -6,7 +6,6 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
-import java.io.*;
 import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
@@ -32,7 +31,6 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
 	private String serverName, contactServerUrl, userName, ip;
-	private static String basePath = ".";
 	private OAuthService service;
 	private Token token;
 	private JSONParser parser;
@@ -153,13 +151,13 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 		} catch (ParseException e) {
 			return null;
 		}
-		
+
 		String[] tmp = path.split("/");
 		String name = tmp[tmp.length - 1];
 		Long length = Long.parseLong(res.get("bytes").toString());
 		SimpleDateFormat dParser = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
 		Date modified = null;
-		
+
 		try {
 			modified = dParser.parse(res.get("modified").toString());
 		} catch (java.text.ParseException e) {
@@ -168,7 +166,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 		boolean isFile = !Boolean.parseBoolean(res.get("is_dir").toString());
 		return new FileInfo(name, length, modified, isFile);
 	}
-	
+
 	public boolean copy(String fromPath, String toPath) throws RemoteException
 	{
 		OAuthRequest request = new OAuthRequest(Verb.POST, COPY_URL + fromPath + "&to_path=" + toPath);
@@ -196,7 +194,64 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 
 	public static void main( String[] args) throws Exception
 	{
-		try {
+		if( args.length != 3 && args.length != 2){
+			System.out.println("Use: java -cp json-simple-1.1.1.jar:scribe-1.3.2.jar:"
+					+ "commons-codec-1.7.jar:. trab1.ProxyDropbox serverName contactServerUrl userName");
+					return;
+		}
+
+		try { // start rmiregistry
+			LocateRegistry.createRegistry( 1099);
+		} catch( RemoteException e) { 
+			// if not start it
+			// do nothing - already started with rmiregistry
+		}
+
+		String serverName = args[0];	
+		String ip = InetAddress.getLocalHost().getHostAddress().toString();
+		String contactServerUrl = "";
+		String userName = "";
+		int flag = 0;
+
+		if (args.length == 3)
+		{
+			contactServerUrl = args[1];
+			userName = args[2];
+			flag++;
+		}
+		else
+		{
+			userName = args[1];
+
+			// Call multicast client to get contact server ip
+
+			int port = 5000;
+			String group = "225.4.5.6";
+
+			try{
+				MulticastSocket s = new MulticastSocket(port);
+				s.joinGroup(InetAddress.getByName(group));
+
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.setSoTimeout(2000); 
+				s.receive(pack);
+
+				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+				flag++;
+			} 
+			catch(Exception e)
+			{
+				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
+				System.exit(0);
+			}
+		}
+
+		try
+		{
 			OAuthService service = new ServiceBuilder().provider(DropBoxApi.class).apiKey(API_KEY)
 					.apiSecret(API_SECRET).scope(SCOPE).build();
 			Scanner in = new Scanner(System.in);
@@ -207,89 +262,23 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 			System.out.print(">>");
 			Verifier verifier = new Verifier(in.nextLine());
 			verifier = new Verifier(requestToken.getSecret());
-			Token accessToken = service.getAccessToken(requestToken, verifier);				
+			Token accessToken = service.getAccessToken(requestToken, verifier);	
 			IProxyDropbox server = new ProxyDropbox(service, accessToken);
-			server.copy("pinto/Imagem.jpg", "novaDir/copiado.jpg");
-		} 
-		catch (Exception e) 
+			Naming.rebind( "/" + serverName + "@" + userName, server);
+			flag++;
+		}
+		catch(Exception e)
 		{
-			e.printStackTrace();
+			System.out.println("Erro ao criar ProxyDropbox");
+			System.exit(0);
 		}
 
-
-		//				if( args.length != 3 && args.length != 2){
-		//					System.out.println("Use: java trab1.FileServer serverName contactServerURL userName");
-		//					return;
-		//				}
-		//		
-		//				try { // start rmiregistry
-		//					LocateRegistry.createRegistry( 1099);
-		//				} catch( RemoteException e) { 
-		//					// if not start it
-		//					// do nothing - already started with rmiregistry
-		//				}
-		//		
-		//				String serverName = args[0];	
-		//				String ip = InetAddress.getLocalHost().getHostAddress().toString();
-		//				String contactServerUrl = "";
-		//				String userName = "";
-		//				int flag = 0;
-		//		
-		//				if (args.length == 3)
-		//				{
-		//					contactServerUrl = args[1];
-		//					userName = args[2];
-		//					flag++;
-		//				}
-		//				else
-		//				{
-		//					userName = args[1];
-		//		
-		//					// Call multicast client to get contact server ip
-		//		
-		//					int port = 5000;
-		//					String group = "225.4.5.6";
-		//		
-		//					try{
-		//						MulticastSocket s = new MulticastSocket(port);
-		//						s.joinGroup(InetAddress.getByName(group));
-		//		
-		//						byte buf[] = new byte[1024];
-		//						DatagramPacket pack = new DatagramPacket(buf, buf.length);
-		//						s.setSoTimeout(2000); 
-		//						s.receive(pack);
-		//		
-		//						contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
-		//		
-		//						s.leaveGroup(InetAddress.getByName(group));
-		//						s.close();
-		//						flag++;
-		//					} 
-		//					catch(Exception e)
-		//					{
-		//						System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
-		//						System.exit(0);
-		//					}
-		//				}
-		//		
-		//				try
-		//				{
-		//					IFileServer server = new FileServer(serverName, contactServerUrl, userName, ip);
-		//					Naming.rebind( "/" + serverName + "@" + userName, server);
-		//					flag++;
-		//				}
-		//				catch(Exception e)
-		//				{
-		//					System.out.println("Erro ao criar FileServer");
-		//					System.exit(0);
-		//				}
-		//		
-		//				if(flag == 2)
-		//				{
-		//					register(serverName, contactServerUrl, userName, ip);
-		//					System.out.println("FileServer RMI running in " + ip + " ...");
-		//				}
-		//			}
-
+		if(flag == 2)
+		{
+			register(serverName, contactServerUrl, userName, ip);
+			System.out.println("ProxyDropbox RMI running in " + ip + " ...");
+		}
 	}
+
 }
+
