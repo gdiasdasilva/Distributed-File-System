@@ -270,6 +270,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 		catch(Exception e)
 		{
 			System.out.println("Erro ao criar ProxyDropbox");
+			e.printStackTrace();
 			System.exit(0);
 		}
 

@@ -6,7 +6,6 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
-import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
