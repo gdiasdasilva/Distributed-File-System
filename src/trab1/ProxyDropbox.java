@@ -27,7 +27,7 @@ import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 import org.json.simple.parser.ParseException;
 
-public class ProxyDropbox extends UnicastRemoteObject implements IFileServer {
+public class ProxyDropbox extends UnicastRemoteObject implements IProxyDropbox {
 
 	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
@@ -44,6 +44,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IFileServer {
 	private static final String METADATA_URL = "https://api.dropbox.com/1/metadata/dropbox";
 	private static final String CREATE_FOLDER_URL = "https://api.dropbox.com/1/fileops/create_folder?root=dropbox&path=";
 	private static final String REMOVE_URL = "https://api.dropbox.com/1/fileops/delete?root=dropbox&path=";
+	private static final String COPY_URL = "https://api.dropbox.com/1/fileops/copy?root=dropbox&from_path=";
 
 	protected ProxyDropbox(String serverName, String contactServerUrl, String userName, String ip) throws RemoteException {
 		super();
@@ -167,17 +168,16 @@ public class ProxyDropbox extends UnicastRemoteObject implements IFileServer {
 		boolean isFile = !Boolean.parseBoolean(res.get("is_dir").toString());
 		return new FileInfo(name, length, modified, isFile);
 	}
-
-	@Override
-	public synchronized boolean pasteFile(byte[] f, String toPath)
-			throws RemoteException, IOException {
-		return false;
-	}
-
-	@Override
-	public byte[] copyFile(String fromPath)
-			throws IOException {
-		return null;
+	
+	public boolean copy(String fromPath, String toPath) throws RemoteException
+	{
+		OAuthRequest request = new OAuthRequest(Verb.POST, COPY_URL + fromPath + "&to_path=" + toPath);
+		service.signRequest(token, request);
+		Response response = request.send();
+		if (response.getCode() == 404 || response.getCode() == 403){
+			return false;
+		}
+		return true;
 	}
 
 	private JSONObject getMetaData(String path, String params) throws ParseException{
@@ -208,7 +208,8 @@ public class ProxyDropbox extends UnicastRemoteObject implements IFileServer {
 			Verifier verifier = new Verifier(in.nextLine());
 			verifier = new Verifier(requestToken.getSecret());
 			Token accessToken = service.getAccessToken(requestToken, verifier);				
-			IFileServer server = new ProxyDropbox(service, accessToken);
+			IProxyDropbox server = new ProxyDropbox(service, accessToken);
+			server.copy("pinto/Imagem.jpg", "novaDir/copiado.jpg");
 		} 
 		catch (Exception e) 
 		{
