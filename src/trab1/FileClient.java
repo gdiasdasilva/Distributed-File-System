@@ -437,7 +437,6 @@ public class FileClient
 					byte[] buffer = pr.copyFile(dir + "/" + tmp[i].split("/")[2]);
 					
 					
-					
 					if (buffer == null)
 						System.out.println("SOU NULO!!!!");
 					
