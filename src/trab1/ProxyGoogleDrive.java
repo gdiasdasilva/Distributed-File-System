@@ -243,4 +243,16 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		//		}
 	}
 
+	@Override
+	public boolean pasteFile(byte[] f, String toPath) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] copyFile(String fromPath) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

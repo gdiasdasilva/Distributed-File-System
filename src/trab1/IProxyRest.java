@@ -6,6 +6,7 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -62,6 +63,25 @@ public interface IProxyRest extends Remote{
 	public void activeTest() throws RemoteException;
 
 	public boolean copy(String string, String string2) throws RemoteException;
+	
+	/**
+	 * Metodo que cria um ficheiro dado um array de bytes que o representa.
+	 * @param f
+	 * @param toPath
+	 * @return
+	 * @throws RemoteException
+	 * @throws IOException
+	 */
+	public boolean pasteFile(byte[] f, String toPath) throws RemoteException;
+	
+	/**
+	 * Metodo que devolve um ficheiro em forma de array de bytes.
+	 * @param fromPath
+	 * @return
+	 * @throws RemoteException
+	 * @throws IOException
+	 */
+	public byte[] copyFile(String fromPath) throws RemoteException;
 	
 
 }

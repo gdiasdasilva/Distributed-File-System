@@ -30,6 +30,7 @@ public class FileClient
 	String username;
 	IContactServer cs;
 	IFileServer fs;
+	IProxyRest pr;
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
@@ -105,8 +106,16 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-					return fs.dir(dir);
+					try
+					{
+						fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return fs.dir(dir);
+					}
+					catch(Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return pr.dir(dir);
+					}
 				}				
 			}
 			else{
@@ -155,8 +164,15 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-					return fs.mkdir(dir);
+					try{
+						fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return fs.mkdir(dir);
+					}
+					catch(Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return pr.mkdir(dir);
+					}					
 				}
 			}
 			else{
@@ -194,8 +210,16 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-					return fs.rmdir(dir);
+					try
+					{
+						fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return fs.rmdir(dir);
+					}
+					catch (Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return pr.rmdir(dir);
+					}
 				}
 			}
 			else{
@@ -233,8 +257,15 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
-					return fs.rm(path);
+					try{
+						fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return fs.rm(path);
+					}
+					catch(Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						return pr.rm(path);
+					}
 				}
 			}
 			else{
@@ -273,8 +304,16 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);	
-					return fs.getAttr(path);
+					try{
+						fs = (IFileServer) Naming.lookup("//" + address + "/" + server + "@" + user);	
+						return fs.getAttr(path);
+					}
+					catch (Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);
+						return pr.getAttr(path);
+					}
+					
 				}
 			}
 			else{
@@ -327,8 +366,16 @@ public class FileClient
 				}
 				else
 				{
-					fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);	
-					bf = fs.copyFile(fromPath);
+					try{
+						fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+						bf = fs.copyFile(fromPath);
+					}
+					catch(Exception e)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+						bf = pr.copyFile(fromPath);
+					}
+						
 				}
 
 				String[] tmpTo = toAddress.split(":");
@@ -341,8 +388,17 @@ public class FileClient
 				}
 				else
 				{	
-					IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
-					return fs2.pasteFile(bf, toPath);
+					try
+					{
+						IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+						return fs2.pasteFile(bf, toPath);
+					}
+					catch(Exception e)
+					{
+						
+						IProxyRest pr2 = (IProxyRest) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+						return pr2.pasteFile(bf, toPath);
+					}
 				}
 			}
 			else

@@ -6,6 +6,7 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
+import java.io.InputStream;
 import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
@@ -43,6 +44,9 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 	private static final String CREATE_FOLDER_URL = "https://api.dropbox.com/1/fileops/create_folder?root=dropbox&path=";
 	private static final String REMOVE_URL = "https://api.dropbox.com/1/fileops/delete?root=dropbox&path=";
 	private static final String COPY_URL = "https://api.dropbox.com/1/fileops/copy?root=dropbox&from_path=";
+	private static final String GET_URL = "https://api-content.dropbox.com/1/files/dropbox/";
+	private static final String PUT_URL = "https://api-content.dropbox.com/1/files_put/dropbox/";
+
 
 	protected ProxyDropbox(String serverName, String contactServerUrl, String userName, String ip) throws RemoteException {
 		super();
@@ -178,18 +182,54 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 		return true;
 	}
 
+	@Override
+	public boolean pasteFile(byte[] f, String toPath) throws RemoteException
+	{
+		OAuthRequest request = new OAuthRequest(Verb.PUT, PUT_URL  + toPath + "?overwrite=false");        
+		service.signRequest(token, request);
+		request.addHeader("Content-Type", "application/octet-stream");
+		request.addPayload(f);
+		request.addHeader("Content-Length", String.valueOf(f.length));
+		Response response = request.send();
+		
+		if (response.getCode() == 411){
+			return false;
+		}
+		
+		return true;
+	}
+
+	@Override
+	public byte[] copyFile(String fromPath) throws RemoteException {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_URL  + fromPath);        
+		service.signRequest(token, request);
+		Response response = request.send();
+		try 
+		{
+			JSONObject res = this.getMetaData(fromPath, "?list=true");
+			int length = Integer.parseInt(res.get("bytes").toString());
+			InputStream input = response.getStream();
+			byte[] buffer = new byte[(int) length ];
+			input.read(buffer);
+			input.close();
+			return buffer;
+		} 
+		catch (Exception e)
+		{
+			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
+			return null;
+		}
+	}
+
 	private JSONObject getMetaData(String path, String params) throws ParseException{
 		// Obter listagem do directorio raiz
 		String req = METADATA_URL + "/" + path + params;
 		OAuthRequest request = new OAuthRequest(Verb.GET, req);
 		service.signRequest(token, request);
 		Response response = request.send();
-
 		if (response.getCode() != 200)
 			throw new RuntimeException("Metadata response code:" + response.getCode());
-
 		return (JSONObject) parser.parse(response.getBody());
-
 	}
 
 	public static void main( String[] args) throws Exception
@@ -197,7 +237,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 		if( args.length != 3 && args.length != 2){
 			System.out.println("Use: java -cp json-simple-1.1.1.jar:scribe-1.3.2.jar:"
 					+ "commons-codec-1.7.jar:. trab1.ProxyDropbox serverName contactServerUrl userName");
-					return;
+			return;
 		}
 
 		try { // start rmiregistry
@@ -222,9 +262,6 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 		else
 		{
 			userName = args[1];
-
-			// Call multicast client to get contact server ip
-
 			int port = 5000;
 			String group = "225.4.5.6";
 
@@ -256,12 +293,12 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 					.apiSecret(API_SECRET).scope(SCOPE).build();
 			Scanner in = new Scanner(System.in);
 			Token requestToken = service.getRequestToken();
-			
+
 			System.out.println("Tem de obter autorizacao para a aplicacao continuar acedendo ao link:");
 			System.out.println(AUTHORIZE_URL + requestToken.getToken());
 			System.out.println("E carregar em enter quando der autorizacao");
 			System.out.print(">>");
-			
+
 			Verifier verifier = new Verifier(in.nextLine());
 			verifier = new Verifier(requestToken.getSecret());
 			Token accessToken = service.getAccessToken(requestToken, verifier);	
@@ -282,6 +319,8 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 			System.out.println("ProxyDropbox RMI running in " + ip + " ...");
 		}
 	}
+
+
 
 }
 
