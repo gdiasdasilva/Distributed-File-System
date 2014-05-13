@@ -94,17 +94,16 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 		} catch (ParseException e) {
 			return null;
 		}
-
+		
 		JSONArray items = (JSONArray) res.get("contents");
 		@SuppressWarnings("rawtypes")
 		Iterator it = items.iterator();
 		String[] tmp = new String[items.size()];
 		int i = 0;
-
 		while (it.hasNext())
 		{
 			JSONObject file = (JSONObject) it.next();
-			tmp[i] = file.get("path").toString();		
+			tmp[i] = file.get("path").toString();	
 			i++;
 		}
 
@@ -224,6 +223,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 	private JSONObject getMetaData(String path, String params) throws ParseException{
 		// Obter listagem do directorio raiz
 		String req = METADATA_URL + "/" + path + params;
+// Perguntar ao prof se a root e ponto?!
 		OAuthRequest request = new OAuthRequest(Verb.GET, req);
 		service.signRequest(token, request);
 		Response response = request.send();

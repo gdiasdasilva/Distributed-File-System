@@ -113,7 +113,7 @@ public class FileClient
 					}
 					catch(Exception e)
 					{
-						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);				
+						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);
 						return pr.dir(dir);
 					}
 				}				
@@ -313,7 +313,7 @@ public class FileClient
 						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);
 						return pr.getAttr(path);
 					}
-					
+
 				}
 			}
 			else{
@@ -375,7 +375,7 @@ public class FileClient
 						pr = (IProxyRest) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
 						bf = pr.copyFile(fromPath);
 					}
-						
+
 				}
 
 				String[] tmpTo = toAddress.split(":");
@@ -395,7 +395,7 @@ public class FileClient
 					}
 					catch(Exception e)
 					{
-						
+
 						IProxyRest pr2 = (IProxyRest) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
 						return pr2.pasteFile(bf, toPath);
 					}
@@ -422,6 +422,49 @@ public class FileClient
 			System.out.println("Problema no acesso ao servidor");
 			return false;
 		}
+	}
+
+	protected boolean sync(String dir_local, String server, String user, String dir){
+		
+		
+		File f = new File(new File("."), dir_local);
+		if(f.isDirectory())
+		{
+			try {
+				String[] tmp = this.dir(server, user, dir);
+				for(int i = 0; i < tmp.length; i++){
+//					byte[] buffer = pr.copyFile(tmp[i]);
+					byte[] buffer = pr.copyFile(dir + "/" + tmp[i].split("/")[2]);
+					
+					
+					
+					if (buffer == null)
+						System.out.println("SOU NULO!!!!");
+					
+//					File file = new File("sync", tmp[i].split("/")[2]);
+					File file = new File(".", dir_local + "/" + tmp[i].split("/")[2]);
+					
+					
+					if(pr.getAttr(dir + "/" + tmp[i].split("/")[2]).isFile){
+						OutputStream out = new FileOutputStream(file);
+						out.write(buffer);
+						out.close();
+						System.out.println("Copiei o ficheiro");
+					}
+					else
+						file.mkdir();
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				return false;	
+			}
+		}
+
+		else
+			System.out.println("Erro ao encontrar directoria");
+
+		return true;
 	}
 
 
@@ -569,9 +612,25 @@ public class FileClient
 				System.out.println("cp path1 path2 - copia o ficheiro path1 para path2; quando path representa um ficheiro num servidor deve ter a forma server@user:path, quando representa um ficheiro local deve ter a forma path");
 				System.out.println("rm path - remove o ficheiro path");
 				System.out.println("getattr path - apresenta informa‹o sobre o ficheiro/directoria path, incluindo: nome, boolean indicando se Ž ficheiro, data da cria‹o, data da œltima modificacao");
-			} else if( cmd[0].equalsIgnoreCase("exit"))
-				break;
+			} 	
+			else if( cmd[0].equalsIgnoreCase("sync")) {
+				String dir_local = cmd[1];
+				String[] dirserver = cmd[2].split(":");
+				String[] serveruser = dirserver[0].split("@");
 
+				String server = dirserver.length == 1 ? null : serveruser[0];
+				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
+				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
+
+				boolean b = sync( dir_local, server, user, dir);
+				if( b)
+					System.out.println( "success");
+				else
+					System.out.println( "error");
+
+			} 
+			else if( cmd[0].equalsIgnoreCase("exit"))
+				break;
 		}
 	}
 
