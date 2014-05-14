@@ -432,7 +432,7 @@ public class FileClient
 
 		if(f.isDirectory())
 		{			
-			if(f.list().length == 0)
+			if(f.list().length == 0) // pode dar problemas com o DS_Store que fica oculto. Atencao!
 			{ //directoria local vazia
 				try
 				{
@@ -497,8 +497,16 @@ public class FileClient
 				}
 			}
 		}
-		else
+		else if(f.isFile())
+		{
 			System.out.println(dir_local + "nao e uma directoria.");
+			return false;
+		}
+		else
+		{
+			f.mkdir();
+			this.sync(dir_local, server, user, dir);
+		}
 
 		return true;
 	}
