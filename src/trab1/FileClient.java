@@ -10,9 +10,11 @@ import java.io.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -424,48 +426,82 @@ public class FileClient
 		}
 	}
 
-	protected boolean sync(String dir_local, String server, String user, String dir){
-		
-		
+	protected boolean sync(String dir_local, String server, String user, String dir)
+	{	
 		File f = new File(new File("."), dir_local);
-		if(f.isDirectory())
-		{
-			try {
-				String[] tmp = this.dir(server, user, dir);
-				for(int i = 0; i < tmp.length; i++){
-//					byte[] buffer = pr.copyFile(tmp[i]);
-					byte[] buffer = pr.copyFile(dir + "/" + tmp[i].split("/")[2]);
-					
-					
-					if (buffer == null)
-						System.out.println("SOU NULO!!!!");
-					
-//					File file = new File("sync", tmp[i].split("/")[2]);
-					File file = new File(".", dir_local + "/" + tmp[i].split("/")[2]);
-					
-					
-					if(pr.getAttr(dir + "/" + tmp[i].split("/")[2]).isFile){
-						OutputStream out = new FileOutputStream(file);
-						out.write(buffer);
-						out.close();
-						System.out.println("Copiei o ficheiro");
-					}
-					else
-						file.mkdir();
-				}
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				return false;	
+		if(f.isDirectory())
+		{			
+			if(f.list().length == 0)
+			{ //directoria local vazia
+				try
+				{
+					String[] tmp = this.dir(server, user, dir);
+					for(int i = 0; i < tmp.length; i++)
+					{
+						byte[] buffer = pr.copyFile(dir + "/" + tmp[i].split("/")[2]);
+						File file = new File(".", dir_local + "/" + tmp[i].split("/")[2]);
+						if(pr.getAttr(dir + "/" + tmp[i].split("/")[2]).isFile)
+						{
+							OutputStream out = new FileOutputStream(file);
+							out.write(buffer);
+							out.close();
+							System.out.println("Sincronizado ficheiro: " + file.getName());
+						}
+						else
+						{
+							file.mkdir();
+							System.out.println("Sincronizada directoria: " + file.getName());
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					return false;	
+				}
+			}
+			else
+			{ // directoria remota vazia
+				String[] tmp = f.list();
+				
+				try
+				{
+					pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
+				} 
+				catch (Exception e) 
+				{
+					System.out.println("Problema ao encontrar proxy dropbox.");
+				}
+				
+				for(int i = 0; i < f.list().length; i++)
+				{
+					try
+					{
+						if(new File(".", f.getName() + "/" + tmp[i]).isDirectory())
+						{
+							pr.mkdir(dir + "/" + tmp[i]);
+						}
+						else
+						{
+							@SuppressWarnings("resource")
+							RandomAccessFile file = new RandomAccessFile(f.getName() + "/" + tmp[i], "r");
+							byte[] b = new byte[(int)file.length()];
+							file.read(b);
+							pr.pasteFile(b, dir + "/" + tmp[i]);
+						}
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
 			}
 		}
-
 		else
-			System.out.println("Erro ao encontrar directoria");
+			System.out.println(dir_local + "nao e uma directoria.");
 
 		return true;
 	}
-
 
 	protected void doit() throws IOException {
 		BufferedReader reader = new BufferedReader( new InputStreamReader( System.in));
