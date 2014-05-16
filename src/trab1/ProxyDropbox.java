@@ -6,6 +6,7 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.*;
 import java.rmi.*;
@@ -303,7 +304,13 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 
 			Verifier verifier = new Verifier(in.nextLine());
 			verifier = new Verifier(requestToken.getSecret());
-			Token accessToken = service.getAccessToken(requestToken, verifier);	
+			Token accessToken = service.getAccessToken(requestToken, verifier);
+			
+			//Escrever token para ficheiro
+//			FileWriter fw = new FileWriter("TokenFile.txt");
+//			fw.write(accessToken.toString());
+//			fw.flush();
+			
 			IProxyRest server = new ProxyDropbox(service, accessToken);
 			Naming.rebind( "/" + serverName + "@" + userName, server);
 			flag++;

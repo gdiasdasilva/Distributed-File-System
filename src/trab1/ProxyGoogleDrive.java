@@ -29,11 +29,11 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	private Token token;
 	private JSONParser parser;
 
-	private static final String API_ID = "893421333980.apps.googleusercontent.com";
-	private static final String API_SECRET = "s7_K5O0O5NnZ8LPu73SE9wPl";
-	protected static final String SCOPE = "https://www.googleapis.com/auth/drive.file"; 
-	protected static final String AUTHORIZE_URL = "https://www.google.com/accounts/OAuthAuthorizeToken?oauth_token=";
-	private static final String FILES_URL = "https://www.googleapis.com/drive/v2/files";
+	private static final String API_ID = "893421333980-gqr98eq20oqmg773ik9c2op4pfuil3l8.apps.googleusercontent.com";
+	private static final String API_SECRET = "O1DhvfeBl-HVDsAhqq2_SoOX";
+	private static final String SCOPE = "https://www.googleapis.com/auth/drive"; 
+	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+	private static final String GET_URL = "https://www.googleapis.com/drive/v2/files/";
 
 
 	protected ProxyGoogleDrive(OAuthService service, Token token) throws RemoteException 
@@ -46,28 +46,50 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
 	RemoteException {
-		String req = FILES_URL + "?q='root'";
-		OAuthRequest request = new OAuthRequest(Verb.GET, req);
+		JSONObject res;
+		try {
+			res = getMetaData();	
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		JSONArray items = (JSONArray) res.get("items");
+		@SuppressWarnings("rawtypes")
+		Iterator it = items.iterator();
+
+		while (it.hasNext())
+		{
+			JSONObject file = (JSONObject) it.next();
+			
+			if(file.get("title").equals(dir)){
+				OAuthRequest request = new OAuthRequest(Verb.GET,"https://www.googleapis.com/drive/v2/files/"+ file.get("id") + "/children");
+				service.signRequest(token, request);
+				Response response = request.send();
+				try {
+					JSONObject p = (JSONObject) parser.parse(response.getBody());
+					System.out.println(response.getBody());
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+
+		return null;
+	}
+
+	private JSONObject getMetaData() throws ParseException{
+
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_URL);
 		service.signRequest(token, request);
 		Response response = request.send();
 
-		JSONObject res;
-		try {
-			res = (JSONObject) parser.parse(response.getBody());
-			JSONArray items = (JSONArray) res.get("items");
-			Iterator it = items.iterator();
-			while (it.hasNext()) {
-				JSONObject file = (JSONObject) it.next();
-				System.out.println(file.get("title"));
-			}
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-
-		return null;
+		if (response.getCode() != 200)
+			throw new RuntimeException("Metadata response code:" + response.getCode());
+		return (JSONObject) parser.parse(response.getBody());
 	}
 
 	private static void register (String serverName, String contactServerURL, String userName, String ip)
@@ -125,34 +147,26 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		return false;
 	}
 
+
+	@Override
+	public boolean pasteFile(byte[] f, String toPath) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] copyFile(String fromPath) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public static void main( String[] args) throws Exception
 	{
-		// comunicacao com a google drive
-		OAuthService service = new ServiceBuilder().provider(GoogleApi.class).apiKey(API_ID)
-				.apiSecret(API_SECRET).scope(SCOPE).build();
-		Scanner in = new Scanner(System.in);
-		// Problema a obter o token
-
-		Token requestToken = service.getRequestToken();
-
-		System.out.println("Tem de obter autorizacao para a aplicacao continuar acedendo ao link:");
-		System.out.println(AUTHORIZE_URL + requestToken.getToken());
-		System.out.println("E copia-la para aqu");
-		System.out.print(">>");
-
-		Verifier verifier = new Verifier(in.nextLine());
-
-		//verifier = new Verifier(requestToken.getSecret());
-		Token accessToken = service.getAccessToken(requestToken, verifier);	
-		IProxyRest server = new ProxyGoogleDrive(service, accessToken);
-		server.dir("");
-
-
 
 		//		if( args.length != 3 && args.length != 2){
 		//			System.out.println("Use: java -cp json-simple-1.1.1.jar:scribe-1.3.2.jar:"
 		//					+ "commons-codec-1.7.jar:. trab1.ProxyGoogleDrive serverName contactServerUrl userName");
-		//					return;
+		//			return;
 		//		}
 		//
 		//		try { // start rmiregistry
@@ -207,26 +221,25 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		//
 		//		try
 		//		{
-		//			// comunicacao com a google drive
-		//			OAuthService service = new ServiceBuilder().provider(GoogleApi.class).apiKey(API_ID)
-		//					.apiSecret(API_SECRET).scope(SCOPE).build();
-		//			Scanner in = new Scanner(System.in);
-		//			// Problema a obter o token
-		//			
-		//			Token requestToken = service.getRequestToken();
-		//			
-		//			System.out.println("Tem de obter autorizacao para a aplicacao continuar acedendo ao link:");
-		//			System.out.println(AUTHORIZE_URL + requestToken.getToken());
-		//			System.out.println("E copia-la para aqu");
-		//			System.out.print(">>");
-		//			
-		//			Verifier verifier = new Verifier(in.nextLine());
-		//			
-		//			//verifier = new Verifier(requestToken.getSecret());
-		//			Token accessToken = service.getAccessToken(requestToken, verifier);	
-		//			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
-		//			server.dir("");
+		OAuthService service = new ServiceBuilder().provider(Google2Api.class).apiKey(API_ID).
+				apiSecret(API_SECRET).scope(SCOPE).build();
+		Scanner in = new Scanner(System.in);
+		String authorizationUrl = service.getAuthorizationUrl(null);
+		// Obter Request token
+		System.out.println("Tem de obter autorizacao para a aplicacao continuar acedendo ao link:");
+		System.out.println(authorizationUrl);
+		System.out.println("E introduzir o codigo fornecido aqui:");
+		System.out.print(">>");
+		Verifier verifier = new Verifier(in.nextLine());
+		Token accessToken = service.getAccessToken(null, verifier);
+
+		OAuthRequest request = new OAuthRequest(Verb.GET, "https://www.googleapis.com/drive/v2/files/root" );
+		service.signRequest(accessToken, request);
+		Response response = request.send();
+
+		IProxyRest server = new ProxyGoogleDrive(service, accessToken);
 		//			Naming.rebind( "/" + serverName + "@" + userName, server);
+		server.dir("teste");
 		//			flag++;
 		//		}
 		//		catch(Exception e)
@@ -243,16 +256,5 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		//		}
 	}
 
-	@Override
-	public boolean pasteFile(byte[] f, String toPath) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public byte[] copyFile(String fromPath) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
