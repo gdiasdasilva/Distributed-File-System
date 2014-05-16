@@ -87,7 +87,7 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
 	RemoteException {
-
+		System.out.println("Vamos listar esta directoria: " + dir);
 		JSONObject res;
 		try {
 			res = this.getMetaData(dir, "?list=true");
@@ -209,13 +209,16 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 			long length = (Long) res.get("bytes");
 			InputStream input = response.getStream();
 			byte[] buffer = new byte[(int) length ];
-			input.read(buffer);
+			
+			for(int i = 0; i<length; i++)
+				buffer[i] = (byte) input.read();
+				
 			input.close();
 			return buffer;
 		} 
 		catch (Exception e)
 		{
-			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
+			System.out.println("Erro ao copiar o ficheiro. Nao encontrado" + " " + fromPath );
 			return null;
 		}
 	}

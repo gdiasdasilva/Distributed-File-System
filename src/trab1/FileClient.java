@@ -116,7 +116,16 @@ public class FileClient
 					catch(Exception e)
 					{
 						pr = (IProxyRest) Naming.lookup("//" + address + "/" + server + "@" + user);
-						return pr.dir(dir);
+						
+						String[] dirList = pr.dir(dir);
+						
+						for(int i = 0; i < dirList.length;i++)
+						{
+							int slashes = dirList[i].split("/").length;
+							dirList[i] = dirList[i].split("/")[slashes-1];
+						}
+							
+						return dirList;
 					}
 				}				
 			}
@@ -436,12 +445,16 @@ public class FileClient
 			{ //directoria local vazia
 				try
 				{
+					System.out.println("DIRECTORIA " + dir);
 					String[] tmp = this.dir(server, user, dir);
+					
 					for(int i = 0; i < tmp.length; i++)
 					{
-						byte[] buffer = pr.copyFile(dir + "/" + tmp[i].split("/")[2]);
-						File file = new File(".", dir_local + "/" + tmp[i].split("/")[2]);
-						if(pr.getAttr(dir + "/" + tmp[i].split("/")[2]).isFile)
+						System.out.println("DIR: " + tmp[i]);
+						byte[] buffer = pr.copyFile(dir + "/" + tmp[i]);
+						File file = new File(".", dir_local + "/" + tmp[i]);
+						
+						if(pr.getAttr(dir + "/" + tmp[i]).isFile)
 						{
 							OutputStream out = new FileOutputStream(file);
 							out.write(buffer);
@@ -451,6 +464,7 @@ public class FileClient
 						else
 						{
 							file.mkdir();
+							this.sync(dir_local + "/" + file.getName(), server, user, dir + "/"+ file.getName());
 							System.out.println("Sincronizada directoria: " + file.getName());
 						}
 					}
@@ -460,42 +474,42 @@ public class FileClient
 					return false;	
 				}
 			}
-			else
-			{ // directoria remota vazia
-				String[] tmp = f.list();
-				
-				try
-				{
-					pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
-				} 
-				catch (Exception e) 
-				{
-					System.out.println("Problema ao encontrar proxy dropbox.");
-				}
-				
-				for(int i = 0; i < f.list().length; i++)
-				{
-					try
-					{
-						if(new File(".", f.getName() + "/" + tmp[i]).isDirectory())
-						{
-							pr.mkdir(dir + "/" + tmp[i]);
-						}
-						else
-						{
-							@SuppressWarnings("resource")
-							RandomAccessFile file = new RandomAccessFile(f.getName() + "/" + tmp[i], "r");
-							byte[] b = new byte[(int)file.length()];
-							file.read(b);
-							pr.pasteFile(b, dir + "/" + tmp[i]);
-						}
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
+//			else
+//			{ // directoria remota vazia
+//				String[] tmp = f.list();
+//				
+//				try
+//				{
+//					pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
+//				} 
+//				catch (Exception e) 
+//				{
+//					System.out.println("Problema ao encontrar proxy dropbox.");
+//				}
+//				
+//				for(int i = 0; i < f.list().length; i++)
+//				{
+//					try
+//					{
+//						if(new File(".", f.getName() + "/" + tmp[i]).isDirectory())
+//						{
+//							pr.mkdir(dir + "/" + tmp[i]);
+//						}
+//						else
+//						{
+//							@SuppressWarnings("resource")
+//							RandomAccessFile file = new RandomAccessFile(f.getName() + "/" + tmp[i], "r");
+//							byte[] b = new byte[(int)file.length()];
+//							file.read(b);
+//							pr.pasteFile(b, dir + "/" + tmp[i]);
+//						}
+//					}
+//					catch (Exception e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			}
 		}
 		else if(f.isFile())
 		{
