@@ -7,6 +7,7 @@ package trab1;
  */
 
 import java.io.*;
+import java.util.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -14,7 +15,6 @@ import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -31,11 +31,13 @@ public class FileClient
 	IContactServer cs;
 	IFileServer fs;
 	IProxyRest pr;
+	private Map<String, Date> filesList;
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
 		this.username = username;	
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
+		filesList = new HashMap<String, Date>();
 	}
 
 	/**
@@ -447,7 +449,6 @@ public class FileClient
 					
 					for(int i = 0; i < tmp.length; i++)
 					{
-						System.out.println("DIR: " + tmp[i]);
 						byte[] buffer = pr.copyFile(dir + "/" + tmp[i]);
 						File file = new File(".", dir_local + "/" + tmp[i]);
 						
@@ -457,6 +458,10 @@ public class FileClient
 							out.write(buffer);
 							out.close();
 							System.out.println("Sincronizado ficheiro: " + file.getName());
+
+							FileInfo fi = this.getFileInfo(file.getName());
+							filesList.put(file.getName(), fi.modified);
+							System.out.println("Data: " + filesList.get(file.getName()));
 						}
 						else
 						{
@@ -468,6 +473,7 @@ public class FileClient
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					return false;	
 				}
 			}
@@ -523,8 +529,16 @@ public class FileClient
 			f.mkdir();
 			this.firstSync(dir_local, server, user, dir);
 		}
-
+		
 		return true;
+	}
+	
+	public FileInfo getFileInfo(String path) throws RemoteException, InfoNotFoundException {
+		File f = new File(new File("."), path);
+		if( f.exists()) {
+			return new FileInfo( path, f.length(), new Date(f.lastModified()), f.isFile());
+		} else
+			return null;
 	}
 
 	protected void doit() throws IOException {
