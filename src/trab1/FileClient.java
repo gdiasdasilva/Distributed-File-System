@@ -10,11 +10,9 @@ import java.io.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.URL;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -435,7 +433,7 @@ public class FileClient
 		}
 	}
 
-	protected boolean sync(String dir_local, String server, String user, String dir)
+	protected boolean firstSync(String dir_local, String server, String user, String dir)
 	{	
 		File f = new File(new File("."), dir_local);
 
@@ -444,8 +442,7 @@ public class FileClient
 			if(f.list().length == 0) // pode dar problemas com o DS_Store que fica oculto. Atencao!
 			{ //directoria local vazia
 				try
-				{
-					System.out.println("DIRECTORIA " + dir);
+				{	
 					String[] tmp = this.dir(server, user, dir);
 					
 					for(int i = 0; i < tmp.length; i++)
@@ -464,7 +461,7 @@ public class FileClient
 						else
 						{
 							file.mkdir();
-							this.sync(dir_local + "/" + file.getName(), server, user, dir + "/"+ file.getName());
+							this.firstSync(dir_local + "/" + file.getName(), server, user, dir + "/"+ file.getName());
 							System.out.println("Sincronizada directoria: " + file.getName());
 						}
 					}
@@ -474,42 +471,47 @@ public class FileClient
 					return false;	
 				}
 			}
-//			else
-//			{ // directoria remota vazia
-//				String[] tmp = f.list();
-//				
-//				try
-//				{
-//					pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
-//				} 
-//				catch (Exception e) 
-//				{
-//					System.out.println("Problema ao encontrar proxy dropbox.");
-//				}
-//				
-//				for(int i = 0; i < f.list().length; i++)
-//				{
-//					try
-//					{
-//						if(new File(".", f.getName() + "/" + tmp[i]).isDirectory())
-//						{
-//							pr.mkdir(dir + "/" + tmp[i]);
-//						}
-//						else
-//						{
-//							@SuppressWarnings("resource")
-//							RandomAccessFile file = new RandomAccessFile(f.getName() + "/" + tmp[i], "r");
-//							byte[] b = new byte[(int)file.length()];
-//							file.read(b);
-//							pr.pasteFile(b, dir + "/" + tmp[i]);
-//						}
-//					}
-//					catch (Exception e)
-//					{
-//						e.printStackTrace();
-//					}
-//				}
-//			}
+			else
+			{ // directoria remota vazia
+				String[] tmp = f.list();
+				
+				try
+				{
+					pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
+				} 
+				catch (Exception e) 
+				{
+					System.out.println("Problema ao encontrar proxy dropbox.");
+				}
+				
+				for(int i = 0; i < f.list().length; i++)
+				{
+					try
+					{
+						if(new File(".", dir_local + "/" + tmp[i]).isDirectory())
+						{
+							pr.mkdir(dir + "/" + tmp[i]);
+							System.out.println("Este parametro e o dir_local: " + dir_local + "/" + tmp[i]);
+							System.out.println("Este parametro e o dir: " + dir + "/" + tmp[i]);
+							this.firstSync(dir_local + "/" + tmp[i], server, user, dir + "/" + tmp[i]);
+							System.out.println("Sincronizada directoria: " + tmp[i]);
+						}
+						else
+						{
+							@SuppressWarnings("resource")
+							RandomAccessFile file = new RandomAccessFile(dir_local + "/" + tmp[i], "r");
+							byte[] b = new byte[(int)file.length()];
+							file.read(b);
+							pr.pasteFile(b, dir + "/" + tmp[i]);
+							System.out.println("Sincronizado ficheiro: " + tmp[i]);
+						}
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		else if(f.isFile())
 		{
@@ -519,7 +521,7 @@ public class FileClient
 		else
 		{
 			f.mkdir();
-			this.sync(dir_local, server, user, dir);
+			this.firstSync(dir_local, server, user, dir);
 		}
 
 		return true;
@@ -679,7 +681,7 @@ public class FileClient
 				String user = dirserver.length == 1 || serveruser.length == 1 ? null : serveruser[1];
 				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
 
-				boolean b = sync( dir_local, server, user, dir);
+				boolean b = firstSync( dir_local, server, user, dir);
 				if( b)
 					System.out.println( "success");
 				else

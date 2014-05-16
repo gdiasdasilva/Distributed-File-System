@@ -87,7 +87,6 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
 	RemoteException {
-		System.out.println("Vamos listar esta directoria: " + dir);
 		JSONObject res;
 		try {
 			res = this.getMetaData(dir, "?list=true");
