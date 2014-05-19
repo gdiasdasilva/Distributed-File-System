@@ -31,13 +31,15 @@ public class FileClient
 	IContactServer cs;
 	IFileServer fs;
 	IProxyRest pr;
-	private Map<String, Date> filesList;
+	private Map<String, Date> filesListLocal;
+	private Map<String, Date> filesListRemote;
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
 		this.username = username;	
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
-		filesList = new HashMap<String, Date>();
+		filesListLocal = new HashMap<String, Date>();
+		filesListRemote = new HashMap<String, Date>();
 	}
 
 	/**
@@ -458,10 +460,9 @@ public class FileClient
 							out.write(buffer);
 							out.close();
 							System.out.println("Sincronizado ficheiro: " + file.getName());
-
-							FileInfo fi = this.getFileInfo(file.getName());
-							filesList.put(file.getName(), fi.modified);
-							System.out.println("Data: " + filesList.get(file.getName()));
+							
+							filesListLocal.put(dir + "/" + tmp[i], pr.getAttr(dir + "/" + tmp[i]).modified);
+							System.out.println("Ficheiro: " + dir + "/" + tmp[i] + " | " + "Data: " + filesListLocal.get(dir + "/" + tmp[i]));
 						}
 						else
 						{
@@ -510,6 +511,8 @@ public class FileClient
 							file.read(b);
 							pr.pasteFile(b, dir + "/" + tmp[i]);
 							System.out.println("Sincronizado ficheiro: " + tmp[i]);
+							filesListRemote.put(dir_local + "/" + tmp[i], this.getFileInfo(dir_local + "/" + tmp[i]).modified);
+							System.out.println("Ficheiro: " + dir_local + "/" + tmp[i] + " | " + "Data: " + this.getFileInfo(dir_local + "/" + tmp[i]).modified);
 						}
 					}
 					catch (Exception e)

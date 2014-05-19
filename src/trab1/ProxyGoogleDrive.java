@@ -286,26 +286,26 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		try {
 			Response response = request.send();
 			JSONObject res = (JSONObject) parser.parse(response.getBody());
-//			long tmp = (Long) res.get("fileSize");
-//			byte[] buffer = new byte[(int) tmp];
-//			String fileUrl = res.get("downloadUrl").toString();
+			System.out.println(res.toString());
+			long tmp = (Long) res.get("fileSize");
+			byte[] buffer = new byte[(int) tmp];
+			String fileUrl = res.get("downloadUrl").toString();
 			OAuthRequest req = new OAuthRequest(Verb.GET, fileUrl);
 			service.signRequest(token, req);
 			response = req.send();
 			InputStream input = response.getStream();
-//
-//			for(int i = 0; i<buffer.length; i++)
-//				buffer[i] = (byte) input.read();
+
+			for(int i = 0; i<buffer.length; i++)
+				buffer[i] = (byte) input.read();
 
 			input.close();
-//			return buffer;
+			return buffer;
 
 		} catch (Exception e) {
 			System.out.println("ERRO copyFile");
 			e.printStackTrace();
 			return null;		
 		}
-		return null;	
 	}
 
 	public static void main( String[] args) throws Exception
@@ -386,8 +386,8 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			Response response = request.send();
 			
 			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
-//			byte[] f = server.copyFile("doc");
-//			server.pasteFile(f, "testeGeral");
+			byte[] f = server.copyFile("doc");
+			server.pasteFile(f, "testeGeral");
 //			Naming.rebind( "/" + serverName + "@" + userName, server);
 //			flag++;
 //		}
