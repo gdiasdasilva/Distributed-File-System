@@ -467,6 +467,8 @@ public class FileClient
 						else
 						{
 							file.mkdir();
+							filesListLocal.put(dir_local + "/" + tmp[i], this.getFileInfo(dir_local + "/" + tmp[i]).modified);
+							filesListRemote.put(dir + "/" + tmp[i], pr.getAttr(dir + "/" + tmp[i]).modified);
 							this.firstSync(dir_local + "/" + file.getName(), server, user, dir + "/"+ file.getName());
 							System.out.println("Sincronizada directoria: " + file.getName());
 						}
@@ -498,6 +500,8 @@ public class FileClient
 						if(new File(".", dir_local + "/" + tmp[i]).isDirectory())
 						{
 							pr.mkdir(dir + "/" + tmp[i]);
+							filesListRemote.put(dir + "/" + tmp[i], pr.getAttr(dir + "/" + tmp[i]).modified);
+							filesListLocal.put(dir_local + "/" + tmp[i], this.getFileInfo(dir_local + "/" + tmp[i]).modified);
 							this.firstSync(dir_local + "/" + tmp[i], server, user, dir + "/" + tmp[i]);
 							System.out.println("Sincronizada directoria: " + tmp[i]);
 						}
@@ -561,7 +565,7 @@ public class FileClient
 			} 
 			catch (Exception e) 
 			{
-				System.out.println("Erro ao lista directoria no metodo sync.");
+				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
 			} 
 
 			for(int i = 0; i < dirList.length;i++)
@@ -582,6 +586,14 @@ public class FileClient
 								System.out.println("Sincronizado ficheiro: " + dirList[i]);
 								filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
 								filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);								
+							}
+							else
+							{	// cria directoria na dropbox
+								pr.mkdir(dir + "/" + dirList[i]);
+								System.out.println("Sincronizada directoria: " + dirList[i]);
+								filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
+								filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);
+								sync(dir_local + "/" + dirList[i], server, user, dir + "/" + dirList[i]);
 							}
 						}
 					}
@@ -607,8 +619,14 @@ public class FileClient
 							filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);
 						}
 						else
-						{
-							// Directoria. TODO
+						{	// cria directoria na dropbox
+							pr.mkdir(dir + "/" + dirList[i]);
+							System.out.println("Sincronizada directoria: " + dirList[i]);
+							filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
+							filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);
+							sync(dir_local + "/" + dirList[i], server, user, dir + "/" + dirList[i]);
+							
+
 						}
 					} 
 					catch (Exception e) 
@@ -641,7 +659,11 @@ public class FileClient
 							}
 							else
 							{
-								// Directoria. TODO
+								file.mkdir();
+								filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);
+								filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+								System.out.println("Sincronizada directoria: " + file.getName());
+								this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
 							}
 						}
 					}
@@ -668,7 +690,11 @@ public class FileClient
 						}
 						else
 						{
-							// Directoria. TODO
+							file.mkdir();
+							filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);							
+							filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+							System.out.println("Sincronizada directoria: " + file.getName());
+							this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
 						}
 					} 
 					catch (Exception e)
