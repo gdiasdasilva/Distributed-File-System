@@ -625,8 +625,6 @@ public class FileClient
 							filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
 							filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);
 							sync(dir_local + "/" + dirList[i], server, user, dir + "/" + dirList[i]);
-							
-
 						}
 					} 
 					catch (Exception e) 

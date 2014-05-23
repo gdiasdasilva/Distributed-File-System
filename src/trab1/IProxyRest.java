@@ -37,16 +37,18 @@ public interface IProxyRest extends Remote{
 	 * @param dir
 	 * @return
 	 * @throws RemoteException
+	 * @throws InfoNotFoundException 
 	 */
-	public boolean rmdir(String dir) throws RemoteException;
+	public boolean rmdir(String dir) throws RemoteException, InfoNotFoundException;
 	
 	/**
 	 * Metodo criado para eliminacao de um ficheiro.
 	 * @param dir
 	 * @return
 	 * @throws RemoteException
+	 * @throws InfoNotFoundException 
 	 */
-	public boolean rm(String dir) throws RemoteException;
+	public boolean rm(String dir) throws RemoteException, InfoNotFoundException;
 	
 	/**
 	 * Metodo que retorna a informacao sobre um ficheiro ou directoria.

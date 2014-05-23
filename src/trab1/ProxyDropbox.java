@@ -6,7 +6,6 @@ package trab1;
  * Joao Francisco Pinto: 41887
  */
 
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.*;
 import java.rmi.*;
@@ -123,27 +122,37 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 	}
 
 	@Override
-	public synchronized boolean rmdir(String dir) throws RemoteException {
-		OAuthRequest request = new OAuthRequest(Verb.POST, REMOVE_URL + dir);
-		service.signRequest(token, request);
-		Response response = request.send();
-		if (response.getCode() == 404){
-			System.out.println("ERRO");
-			return false;
+	public synchronized boolean rmdir(String dir) throws RemoteException, InfoNotFoundException {
+		if(!this.getAttr(dir).isFile)
+		{
+			OAuthRequest request = new OAuthRequest(Verb.POST, REMOVE_URL + dir);
+			service.signRequest(token, request);
+			Response response = request.send();
+			if (response.getCode() == 404){
+				System.out.println("ERRO");
+				return false;
+			}
+			return true;
 		}
-		return true;
+		else
+			return false;
 	}
 
 	@Override
-	public synchronized boolean rm(String dir) throws RemoteException {
-		OAuthRequest request = new OAuthRequest(Verb.POST, REMOVE_URL + dir);
-		service.signRequest(token, request);
-		Response response = request.send();
-		if (response.getCode() == 404){
-			System.out.println("ERRO");
-			return false;
+	public synchronized boolean rm(String dir) throws RemoteException, InfoNotFoundException {
+		if(this.getAttr(dir).isFile)
+		{
+			OAuthRequest request = new OAuthRequest(Verb.POST, REMOVE_URL + dir);
+			service.signRequest(token, request);
+			Response response = request.send();
+			if (response.getCode() == 404){
+				System.out.println("ERRO");
+				return false;
+			}
+			return true;
 		}
-		return true;
+		else
+			return false;
 	}
 
 	@Override
