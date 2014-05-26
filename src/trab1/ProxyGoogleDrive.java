@@ -148,8 +148,10 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	}
 
 	@Override
-	public boolean rmdir(String dir) throws RemoteException {
+	public boolean rmdir(String dir) throws RemoteException, InfoNotFoundException {
 		//TESTADO
+		if(!getAttr(dir).isFile)
+		{
 		String id = getId(dir);
 		OAuthRequest request = new OAuthRequest(Verb.DELETE, GET_URL + id);
 		service.signRequest(token, request);
@@ -157,22 +159,30 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 
 		if(response.getCode() != 204)
 			return false;
-		else
+		else 
 			return true;
+		}
+		else
+			return false;
 	}
 
 	@Override
-	public boolean rm(String dir) throws RemoteException {
+	public boolean rm(String dir) throws RemoteException, InfoNotFoundException {
 		//TESTADO
+		if(getAttr(dir).isFile)
+		{
 		String id = getId(dir);
 		OAuthRequest request = new OAuthRequest(Verb.DELETE, GET_URL + id);
 		service.signRequest(token, request);
 		Response response = request.send();
-
+		
 		if(response.getCode() != 204)
 			return false;
 		else
 			return true;
+		}	
+		else
+			return false;
 	}
 
 	@Override
@@ -208,7 +218,6 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			return null;		
 		}	
 		FileInfo f = new FileInfo(name, length, modified, isFile);
-		System.out.println(f);
 		return new FileInfo(name, length, modified, isFile);
 	}
 
@@ -311,11 +320,11 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	public static void main( String[] args) throws Exception
 	{
 
-//		if( args.length != 3 && args.length != 2){
-//			System.out.println("Use: java -cp json-simple-1.1.1.jar:scribe-1.3.2.jar:"
-//					+ "commons-codec-1.7.jar:. trab1.ProxyGoogleDrive serverName contactServerUrl userName");
-//			return;
-//		}
+		if( args.length != 3 && args.length != 2){
+			System.out.println("Use: java -cp json-simple-1.1.1.jar:scribe-1.3.2.jar:"
+					+ "commons-codec-1.7.jar:. trab1.ProxyGoogleDrive serverName contactServerUrl userName");
+			return;
+		}
 //
 //		try { // start rmiregistry
 //			LocateRegistry.createRegistry( 1099);
@@ -367,8 +376,8 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 //			}
 //		}
 //
-//		try
-//		{
+		try
+		{
 			OAuthService service = new ServiceBuilder().provider(Google2Api.class).apiKey(API_ID).
 					apiSecret(API_SECRET).scope(SCOPE).build();
 			Scanner in = new Scanner(System.in);
@@ -386,17 +395,18 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			Response response = request.send();
 			
 			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
-			byte[] f = server.copyFile("doc");
-			server.pasteFile(f, "testeGeral");
+			
+//			byte[] f = server.copyFile("doc");
+//			server.pasteFile(f, "testeGeral");
 //			Naming.rebind( "/" + serverName + "@" + userName, server);
 //			flag++;
-//		}
-//		catch(Exception e)
-//		{
-//			System.out.println("Erro ao criar ProxyGoogleDrive");
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
+		}
+		catch(Exception e)
+		{
+			System.out.println("Erro ao criar ProxyGoogleDrive");
+			e.printStackTrace();
+			System.exit(0);
+		}
 //
 //		if(flag == 2)
 //		{
