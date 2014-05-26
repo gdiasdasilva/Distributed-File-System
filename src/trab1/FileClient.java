@@ -541,7 +541,17 @@ public class FileClient
 			{ //directoria local vazia
 				try
 				{	
-					String[] tmp = this.dir(server, user, dir);
+					String[] dirListTmp = this.dir(server, user, dir);
+					
+					List<String> dirListArray = new ArrayList<String>();
+
+					for(int x = 0; x < dirListTmp.length; x++)
+					{
+						if(!dirListTmp[x].equals(".DS_Store"))
+							dirListArray.add(dirListTmp[x]);
+					}
+
+					String[] tmp = dirListArray.toArray(new String[dirListArray.size()]);
 
 					for(int i = 0; i < tmp.length; i++)
 					{
@@ -660,32 +670,22 @@ public class FileClient
 			}
 
 			String[] dirList = dirListArray.toArray(new String[dirListArray.size()]);
-
 			String[] dropList = null;
-
-			try
-			{
-				dropList = pr.dir(dir);
-			} 
-			catch (Exception e) 
-			{
-				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
-			} 
 
 			Iterator<String> it = filesListLocal.keySet().iterator();
 			List<String> keyList = new ArrayList<String>();
-
 
 			while(it.hasNext())
 			{	
 				String key = it.next();
 				boolean hasFile = false;
 
-				for(int i = 0; i<dirList.length; i++)
+				for(int i = 0; i < dirList.length; i++)
 				{
+					String[] stringSplitLocal = key.split("/");
 					if(filesListLocal.containsKey(key))
 					{
-						if(filesListLocal.get(key).equals(dirList[i]))
+						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
 						{
 							hasFile = true;
 						}	
@@ -697,9 +697,9 @@ public class FileClient
 
 						try
 						{
-							String[] tmp =  filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
+							String[] tmp = filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
 
-							for(int j = 0; j<tmp.length;j++)
+							for(int j = 0; j < tmp.length; j++)
 							{
 								String[] stringSplit = key.split("/");
 								if(tmp[j].contains(stringSplit[stringSplit.length-1]))
@@ -724,6 +724,15 @@ public class FileClient
 			{
 				filesListLocal.remove(keys[k]);
 			}
+			
+			try
+			{
+				dropList = pr.dir(dir);
+			} 
+			catch (Exception e) 
+			{
+				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
+			} 
 
 			for(int i = 0; i < dirList.length;i++)
 			{
