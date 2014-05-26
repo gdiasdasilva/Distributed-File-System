@@ -365,9 +365,74 @@ public class FileClient
 				toPath + " no servidor " + toServer +"@" + toUser);
 		try
 		{
-			String fromAddress = cs.serverAddress(fromServer, username);
-			String toAddress = cs.serverAddress(toServer, username);
-			
+			String fromAddress=null;
+			String toAddress=null;
+
+			if(fromServer == null && fromUser == null){
+				toAddress = cs.serverAddress(toServer, username);
+			}
+			else if(toServer == null && toUser == null)
+				fromAddress = cs.serverAddress(fromServer, username);
+
+			else if(fromServer != null && fromUser != null && toServer != null && toUser !=null){
+				toAddress = cs.serverAddress(toServer, username);
+
+				fromAddress = cs.serverAddress(fromServer, username);
+			}
+			if(fromAddress == null)
+			{
+				String[] tmpTo = toAddress.split(":");
+				byte[] tmp = this.copyFile(fromPath);
+
+				if(tmpTo[0].equals("http"))
+				{
+					FileServerWSService serviceTo = new FileServerWSService( new URL( toAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWSTo = serviceTo.getFileServerWSPort();
+					return serverWSTo.pasteFile(tmp, toPath);
+				}
+				else
+				{
+					try
+					{
+						IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+						return fs2.pasteFile(tmp, toPath);
+					}
+					catch(Exception e2)
+					{
+						IProxyRest pr2 = (IProxyRest) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+						return pr2.pasteFile(tmp, toPath);
+					}
+				}					
+			}
+			else if(toAddress == null)
+			{
+				String[] tmpFrom = fromAddress.split(":");
+				byte[] tmp = null;
+
+				if(tmpFrom[0].equals("http"))
+				{
+					//WS
+					FileServerWSService serviceFrom = new FileServerWSService( new URL( fromAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+					ws.FileServerWS serverWSFrom = serviceFrom.getFileServerWSPort();
+					tmp = serverWSFrom.copyFile(fromPath);
+				}
+				else
+				{
+					try{
+						fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+						tmp = fs.copyFile(fromPath);
+					}
+					catch(Exception e1)
+					{
+						pr = (IProxyRest) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+						tmp = pr.copyFile(fromPath);
+					}
+				}
+
+				this.pasteFile(tmp, toPath);
+				return true;
+			}
+
 			if(fromAddress != null && toAddress != null)
 			{
 				byte[] bf;
@@ -418,59 +483,8 @@ public class FileClient
 			}
 			else
 			{
-				if(fromAddress == null)
-				{
-					String[] tmpTo = toAddress.split(":");
-					byte[] tmp = this.copyFile(fromPath);
-					
-					if(tmpTo[0].equals("http"))
-					{
-						FileServerWSService serviceTo = new FileServerWSService( new URL( toAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
-						ws.FileServerWS serverWSTo = serviceTo.getFileServerWSPort();
-						return serverWSTo.pasteFile(tmp, toPath);
-					}
-					else
-					{
-						try
-						{
-							IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
-							return fs2.pasteFile(tmp, toPath);
-						}
-						catch(Exception e)
-						{
-							IProxyRest pr2 = (IProxyRest) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
-							return pr2.pasteFile(tmp, toPath);
-						}
-					}					
-				}
-				else
-				{
-					String[] tmpFrom = fromAddress.split(":");
-					byte[] tmp = null;
-					
-					if(tmpFrom[0].equals("http"))
-					{
-						//WS
-						FileServerWSService serviceFrom = new FileServerWSService( new URL( fromAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
-						ws.FileServerWS serverWSFrom = serviceFrom.getFileServerWSPort();
-						tmp = serverWSFrom.copyFile(fromPath);
-					}
-					else
-					{
-						try{
-							fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
-							tmp = fs.copyFile(fromPath);
-						}
-						catch(Exception e)
-						{
-							pr = (IProxyRest) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
-							tmp = pr.copyFile(fromPath);
-						}
-					}
-					
-					this.pasteFile(tmp, toPath);
-					return true;
-				}
+				System.out.println("Erro ao executar o cp");
+				return false;
 			}
 		}
 		catch(IOException e)
@@ -503,7 +517,7 @@ public class FileClient
 			return null;
 		}
 	}
-	
+
 	protected boolean pasteFile(byte[] f, String toPath){
 		try{
 			File file = new File(basePath, toPath);
@@ -516,7 +530,7 @@ public class FileClient
 			return false;
 		}
 	}
-	
+
 	protected boolean firstSync(String dir_local, String server, String user, String dir)
 	{	
 		File f = new File(new File("."), dir_local);
@@ -638,17 +652,17 @@ public class FileClient
 			File f = new File(new File("."), dir_local);
 			String[] dirListTmp = f.list();
 			List<String> dirListArray = new ArrayList<String>();
-			
+
 			for(int x = 0; x < dirListTmp.length; x++)
 			{
 				if(!dirListTmp[x].equals(".DS_Store"))
 					dirListArray.add(dirListTmp[x]);
 			}
-			
+
 			String[] dirList = dirListArray.toArray(new String[dirListArray.size()]);
-			
+
 			String[] dropList = null;
-			
+
 			try
 			{
 				dropList = pr.dir(dir);
@@ -657,16 +671,16 @@ public class FileClient
 			{
 				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
 			} 
-			
+
 			Iterator<String> it = filesListLocal.keySet().iterator();
 			List<String> keyList = new ArrayList<String>();
 
-			
+
 			while(it.hasNext())
 			{	
 				String key = it.next();
 				boolean hasFile = false;
-				
+
 				for(int i = 0; i<dirList.length; i++)
 				{
 					if(filesListLocal.containsKey(key))
@@ -676,15 +690,15 @@ public class FileClient
 							hasFile = true;
 						}	
 					}
-					
+
 					if(!hasFile)
 					{
 						keyList.add(key);
-							
+
 						try
 						{
 							String[] tmp =  filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
-							
+
 							for(int j = 0; j<tmp.length;j++)
 							{
 								String[] stringSplit = key.split("/");
@@ -703,14 +717,14 @@ public class FileClient
 					}
 				}
 			}
-			
+
 			String[] keys = keyList.toArray(new String[keyList.size()]);
-			
+
 			for(int k = 0; k < keys.length; k++)
 			{
 				filesListLocal.remove(keys[k]);
 			}
-			
+
 			for(int i = 0; i < dirList.length;i++)
 			{
 				if(filesListLocal.containsKey(dir_local + "/" + dirList[i]))
