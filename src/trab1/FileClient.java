@@ -34,6 +34,7 @@ public class FileClient
 	private Map<String, Date> filesListLocal;
 	private Map<String, Date> filesListRemote;
 	private static String basePath = ".";
+	private List<String> dirListArray;
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
@@ -41,6 +42,7 @@ public class FileClient
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 		filesListLocal = new HashMap<String, Date>();
 		filesListRemote = new HashMap<String, Date>();
+		dirListArray = new ArrayList<String>();
 	}
 
 	/**
@@ -674,7 +676,7 @@ public class FileClient
 
 			File f = new File(new File("."), dir_local);
 			String[] dirListTmp = f.list();
-			List<String> dirListArray = new ArrayList<String>();
+//			List<String> dirListArray = new ArrayList<String>();
 
 			for(int x = 0; x < dirListTmp.length; x++)
 			{
@@ -683,6 +685,9 @@ public class FileClient
 			}
 
 			String[] dirList = dirListArray.toArray(new String[dirListArray.size()]);
+			for(int i = 0; i<dirList.length; i++){
+				System.out.println(dirList[i]);
+			}
 			String[] dropList = null;
 
 			Iterator<String> it = filesListLocal.keySet().iterator();
@@ -692,14 +697,14 @@ public class FileClient
 			{	
 				String key = it.next();
 				boolean hasFile = false;
-				System.out.println("KEY: " + key);
+//				System.out.println("KEY: " + key);
 				for(int i = 0; i < dirList.length; i++)
 				{
 					String[] stringSplitLocal = key.split("/");
 					if(filesListLocal.containsKey(key))
 					{
-						System.out.println("DIR LIST: "+ dirList[i]);
-						System.out.println("KEY SPLIT: "+ stringSplitLocal[stringSplitLocal.length-1]);
+//						System.out.println("DIR LIST: "+ dirList[i]);
+//						System.out.println("KEY SPLIT: "+ stringSplitLocal[stringSplitLocal.length-1]);
 						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
 						{
 							hasFile = true;
@@ -748,18 +753,16 @@ public class FileClient
 			} 
 			System.out.println("Lista Local: " +filesListLocal.keySet().toString());
 			System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
-
+			
 
 			for(int i = 0; i < dirList.length;i++)
 			{
 				if(filesListLocal.containsKey(dir_local + "/" + dirList[i]))
 				{
-					System.out.println("Bronca, existe a chave");
 					try
 					{
 						if(filesListLocal.get(dir_local + "/" + dirList[i]).before(this.getFileInfo(dir_local + "/" + dirList[i]).modified))
 						{
-							System.out.println("Ficheiro foi modificado");
 							// ficheiro foi modificado
 							if(this.getFileInfo(dir_local + "/" + dirList[i]).isFile)
 							{
@@ -789,10 +792,12 @@ public class FileClient
 				}
 				else
 				{	
-					System.out.println("Sou ficheiro novo, nao estou nos mapas");
 					// ficheiro novo na pasta. nao esta no mapa
 					try
 					{
+						System.out.println("Ficheiro novo nao esta no mapa");
+						System.out.println("DIR LOCAL: " + dir_local);
+						System.out.println(dirList[i]);
 						if(this.getFileInfo(dir_local + "/" + dirList[i]).isFile)
 						{
 							RandomAccessFile fi = new RandomAccessFile(dir_local + "/" + dirList[i], "r");
@@ -810,14 +815,8 @@ public class FileClient
 							System.out.println("Sincronizada directoria: " + dirList[i]);
 							filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
 							filesListRemote.put(dir + "/" + dirList[i], pr.getAttr(dir + "/" + dirList[i]).modified);
-							System.out.println("dentro do else do else");
-							System.out.println("Lista Local: " +filesListLocal.keySet().toString());
-							System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
 							sync(dir_local + "/" + dirList[i], server, user, dir + "/" + dirList[i]);
 						}
-						System.out.println("Else de ficheiro novo e e pasta local");
-						System.out.println("Lista Local: " +filesListLocal.keySet().toString());
-						System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
 					} 
 					catch (Exception e) 
 					{
