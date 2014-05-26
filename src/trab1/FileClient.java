@@ -33,6 +33,7 @@ public class FileClient
 	IProxyRest pr;
 	private Map<String, Date> filesListLocal;
 	private Map<String, Date> filesListRemote;
+	private static String basePath = ".";
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
@@ -366,6 +367,7 @@ public class FileClient
 		{
 			String fromAddress = cs.serverAddress(fromServer, username);
 			String toAddress = cs.serverAddress(toServer, username);
+			
 			if(fromAddress != null && toAddress != null)
 			{
 				byte[] bf;
@@ -416,8 +418,59 @@ public class FileClient
 			}
 			else
 			{
-				System.out.println("Url do servidor inv‡lido");
-				return false;
+				if(fromAddress == null)
+				{
+					String[] tmpTo = toAddress.split(":");
+					byte[] tmp = this.copyFile(fromPath);
+					
+					if(tmpTo[0].equals("http"))
+					{
+						FileServerWSService serviceTo = new FileServerWSService( new URL( toAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+						ws.FileServerWS serverWSTo = serviceTo.getFileServerWSPort();
+						return serverWSTo.pasteFile(tmp, toPath);
+					}
+					else
+					{
+						try
+						{
+							IFileServer fs2 = (IFileServer) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+							return fs2.pasteFile(tmp, toPath);
+						}
+						catch(Exception e)
+						{
+							IProxyRest pr2 = (IProxyRest) Naming.lookup("//" + toAddress + "/" + toServer + "@" + toUser);
+							return pr2.pasteFile(tmp, toPath);
+						}
+					}					
+				}
+				else
+				{
+					String[] tmpFrom = fromAddress.split(":");
+					byte[] tmp = null;
+					
+					if(tmpFrom[0].equals("http"))
+					{
+						//WS
+						FileServerWSService serviceFrom = new FileServerWSService( new URL( fromAddress + "/FileServer?wsdl"), new QName("http://trab1/", "FileServerWSService"));
+						ws.FileServerWS serverWSFrom = serviceFrom.getFileServerWSPort();
+						tmp = serverWSFrom.copyFile(fromPath);
+					}
+					else
+					{
+						try{
+							fs = (IFileServer) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+							tmp = fs.copyFile(fromPath);
+						}
+						catch(Exception e)
+						{
+							pr = (IProxyRest) Naming.lookup("//" + fromAddress + "/" + fromServer + "@" + fromUser);
+							tmp = pr.copyFile(fromPath);
+						}
+					}
+					
+					this.pasteFile(tmp, toPath);
+					return true;
+				}
 			}
 		}
 		catch(IOException e)
@@ -437,6 +490,33 @@ public class FileClient
 		}
 	}
 
+	protected byte[] copyFile(String fromPath){
+		try {
+			File f = new File(basePath, fromPath);
+			InputStream input = new FileInputStream(f);
+			byte[] buffer = new byte[(int) f.length()];
+			input.read(buffer);
+			input.close();
+			return buffer;
+		} catch (Exception e) {
+			System.out.println("Erro ao copiar o ficheiro. Nao encontrado");
+			return null;
+		}
+	}
+	
+	protected boolean pasteFile(byte[] f, String toPath){
+		try{
+			File file = new File(basePath, toPath);
+			OutputStream out = new FileOutputStream(file);
+			out.write(f);
+			out.close();
+			return true;
+		} catch(Exception e){
+			System.out.println("Erro na gravacao do ficheiro");
+			return false;
+		}
+	}
+	
 	protected boolean firstSync(String dir_local, String server, String user, String dir)
 	{	
 		File f = new File(new File("."), dir_local);
