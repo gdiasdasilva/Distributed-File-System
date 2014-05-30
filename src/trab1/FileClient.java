@@ -34,7 +34,6 @@ public class FileClient
 	private Map<String, Date> filesListLocal;
 	private Map<String, Date> filesListRemote;
 	private static String basePath = ".";
-	private List<String> dirListArray;
 
 	protected FileClient( String url, String username) throws Exception {
 		this.contactServerURL = url;
@@ -42,7 +41,7 @@ public class FileClient
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 		filesListLocal = new HashMap<String, Date>();
 		filesListRemote = new HashMap<String, Date>();
-		dirListArray = new ArrayList<String>();
+		
 	}
 
 	/**
@@ -663,6 +662,9 @@ public class FileClient
 			firstSync(dir_local, server, user, dir);
 		else
 		{
+			int count = 0;
+			String[] dirPassed = null;
+			dirPassed[count++] = dir_local;
 			System.out.println("mapas nao vazios");
 			try
 			{
@@ -676,7 +678,7 @@ public class FileClient
 
 			File f = new File(new File("."), dir_local);
 			String[] dirListTmp = f.list();
-//			List<String> dirListArray = new ArrayList<String>();
+			List<String> dirListArray = new ArrayList<String>();
 
 			for(int x = 0; x < dirListTmp.length; x++)
 			{
@@ -703,8 +705,9 @@ public class FileClient
 					String[] stringSplitLocal = key.split("/");
 					if(filesListLocal.containsKey(key))
 					{
-//						System.out.println("DIR LIST: "+ dirList[i]);
-//						System.out.println("KEY SPLIT: "+ stringSplitLocal[stringSplitLocal.length-1]);
+						System.out.println("DIR LIST: "+ dirList[i]);
+						System.out.println("contenho a key");
+						System.out.println("KEY SPLIT: "+ stringSplitLocal[stringSplitLocal.length-1]);
 						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
 						{
 							hasFile = true;

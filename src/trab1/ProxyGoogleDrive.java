@@ -1,5 +1,8 @@
 package trab1;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -37,7 +40,7 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	private static final String SCOPE = "https://www.googleapis.com/auth/drive"; 
 	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 	private static final String GET_URL = "https://www.googleapis.com/drive/v2/files/";
-	private static final String UPLOAD = "https://www.googleapis.com/upload/drive/v2/files?uploadType=resumable";
+	private static final String UPLOAD = "https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart";
 
 
 
@@ -247,7 +250,13 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		OAuthRequest request = new OAuthRequest(Verb.POST, UPLOAD);
 		service.signRequest(token, request);
 		try{
-
+			
+			String boundary = "-------314159265358979323846";
+		    String delimiter = "\r\n--" + boundary + "\r\n";
+		    String close_delim = "\r\n--" + boundary + "--";
+		    
+		    String contentType = "application/octet-stream";
+		
 			JSONObject tmp = new JSONObject();
 			tmp.put("id", id);
 
@@ -258,21 +267,42 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			js.put("title", name);
 			js.put("parents", array);
 
-			request.addHeader("Content-type", "application/json");
-			request.addHeader("Accept", "application/json");
-			request.addHeader("X-Upload-Content-Type", "application/octet-stream");
-			request.addHeader("X-Upload-Content-Length",String.valueOf(f.length));
+			request.addHeader("Content-type", "multipart/related; boundary=" + "\"" + boundary + "\"");
+			request.addHeader("Content-Length", String.valueOf(f.length));
+			
+			// boundary inicial aqui
+			
+			ByteArrayOutputStream ba = new ByteArrayOutputStream();		
+			
+			String multipartRequestBody =
+			        delimiter +  "Content-Type: application/json\r\n\r\n" +
+			        js.toString() +
+			        delimiter + "Content-Type: " + contentType + "\r\n" + "\r\n" +
+			        new String(f) +
+			        close_delim;
+			
+			ba.write(multipartRequestBody.getBytes());
+			request.addPayload(ba.toString());
+			
+			
+			
+//			String content = "--" + boundary + "\nContent-type: application/json; charset=UTF-8\n" + js.toString() + "\n" +
+//			"--" + boundary + "Content-Type: image/jpeg\n";
+			
+//			ba.write(content.getBytes());
+//			ba.write(f);
+//			ba.write(final_boundary.getBytes());
 
-			request.addPayload(js.toString());
+//			request.addPayload(ba.toString());
 			Response response = request.send();
-
-			//2a parte
-			OAuthRequest req = new OAuthRequest(Verb.PUT, UPLOAD + "&upload_id=" + response.getHeader("Location"));
-			service.signRequest(token, req);
-			req.addHeader("Content-Length",String.valueOf(f.length));
-			request.addHeader("Content-Type", "image/jpeg");
-			req.addPayload(f);
-			response = req.send();
+					
+//			//2a parte
+//			OAuthRequest req = new OAuthRequest(Verb.PUT, UPLOAD + "&upload_id=" + response.getHeader("Location"));
+//			service.signRequest(token, req);
+//			req.addHeader("Content-Length",String.valueOf(f.length));
+//			request.addHeader("Content-Type", "image/jpeg");
+//			req.addPayload(f);
+//			response = req.send();
 			if(response.getCode() != 200)
 				return false;
 			else
@@ -295,19 +325,21 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		try {
 			Response response = request.send();
 			JSONObject res = (JSONObject) parser.parse(response.getBody());
-			System.out.println(res.toString());
-			long tmp = (Long) res.get("fileSize");
-			byte[] buffer = new byte[(int) tmp];
+//			long tmp = Long.parseLong(res.get("fileSize"));
+			int tmp = Integer.parseInt((String) res.get("fileSize"));
+			byte[] buffer = new byte[tmp];
 			String fileUrl = res.get("downloadUrl").toString();
 			OAuthRequest req = new OAuthRequest(Verb.GET, fileUrl);
 			service.signRequest(token, req);
 			response = req.send();
-			InputStream input = response.getStream();
+			DataInputStream dis = new DataInputStream(response.getStream());
+			dis.readFully(buffer);
+//			InputStream input = response.getStream();
 
-			for(int i = 0; i<buffer.length; i++)
-				buffer[i] = (byte) input.read();
-
-			input.close();
+//			for(int i = 0; i<buffer.length; i++)
+//				buffer[i] = (byte) input.read();
+//
+//			input.close();
 			return buffer;
 
 		} catch (Exception e) {
@@ -396,8 +428,9 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			
 			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
 			
-//			byte[] f = server.copyFile("doc");
-//			server.pasteFile(f, "testeGeral");
+			
+			byte[] f = server.copyFile("goncalo");
+			System.out.println(server.pasteFile(f, "Pinto/bla/teste2"));
 //			Naming.rebind( "/" + serverName + "@" + userName, server);
 //			flag++;
 		}
