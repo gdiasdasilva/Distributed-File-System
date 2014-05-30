@@ -34,6 +34,7 @@ public class FileClient
 	private Map<String, Date> filesListLocal;
 	private Map<String, Date> filesListRemote;
 	private Map<String, Boolean> localFound;
+	private Map<String, Boolean> remoteFound;
 	private static String basePath = ".";
 
 	protected FileClient( String url, String username) throws Exception {
@@ -43,6 +44,7 @@ public class FileClient
 		filesListLocal = new HashMap<String, Date>();
 		filesListRemote = new HashMap<String, Date>();
 		localFound = new HashMap<String, Boolean>();
+		remoteFound = new HashMap<String, Boolean>();
 		
 	}
 
@@ -664,7 +666,6 @@ public class FileClient
 			firstSync(dir_local, server, user, dir);
 		else
 		{
-			System.out.println("mapas nao vazios");
 			try
 			{
 				pr = (IProxyRest) Naming.lookup("//" + cs.serverAddress(server, user) + "/" + server + "@" + user);
@@ -686,9 +687,6 @@ public class FileClient
 			}
 
 			String[] dirList = dirListArray.toArray(new String[dirListArray.size()]);
-			for(int i = 0; i<dirList.length; i++){
-				System.out.println(dirList[i]);
-			}
 			
 			String[] dropList = null;
 
@@ -759,9 +757,70 @@ public class FileClient
 				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
 			} 
 			
-			System.out.println("Lista Local: " +filesListLocal.keySet().toString());
-			System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
-			System.out.println("Lista Found : " + localFound.keySet().toString());
+			Iterator<String> itR = filesListRemote.keySet().iterator();
+			List<String> keyListR = new ArrayList<String>();
+			
+			while(itR.hasNext())
+			{
+				String keyR = itR.next();
+				boolean hasFile = false;
+				
+				for(int i = 0; i < dropList.length; i++)
+				{
+					String[] stringSplitRemote = keyR.split("/");
+					
+					if(filesListRemote.containsKey(keyR))
+					{
+						if(dropList[i].contains(stringSplitRemote[stringSplitRemote.length-1]))
+						{
+							hasFile = true;
+							remoteFound.put(keyR, true);
+						}	
+					}
+				}
+				
+				if(!hasFile)
+				{
+					if(!remoteFound.containsKey(keyR))
+						keyListR.add(keyR);
+					
+					try
+					{
+						String[] tmp = filesListLocal.keySet().toArray(new String[filesListLocal.size()]);
+
+						for(int j = 0; j < tmp.length; j++)
+						{
+							String[] stringSplit = keyR.split("/");
+							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
+							{
+								if(!remoteFound.containsKey(keyR))
+								{
+									File fr = new File(new File("."), tmp[j]);
+									fr.delete();
+									filesListLocal.remove(tmp[j]);
+								}
+								
+							}
+						}
+					} 
+					catch (Exception e) 
+					{
+						System.out.println("Erro ao apagar o ficheiro na sincronizacao da dropbox");
+						e.printStackTrace();
+					}
+				}
+			}
+
+			String[] keysr = keyListR.toArray(new String[keyListR.size()]);
+
+			for(int k = 0; k < keysr.length; k++)
+			{
+				filesListRemote.remove(keysr[k]);
+			}
+			
+//			System.out.println("Lista Local: " +filesListLocal.keySet().toString());
+//			System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
+//			System.out.println("Lista Found : " + localFound.keySet().toString());
 
 			for(int i = 0; i < dirList.length;i++)
 			{
@@ -803,9 +862,7 @@ public class FileClient
 					// ficheiro novo na pasta. nao esta no mapa
 					try
 					{
-						System.out.println("Ficheiro novo nao esta no mapa");
-						System.out.println("DIR LOCAL: " + dir_local);
-						System.out.println(dirList[i]);
+					
 						if(this.getFileInfo(dir_local + "/" + dirList[i]).isFile)
 						{
 							RandomAccessFile fi = new RandomAccessFile(dir_local + "/" + dirList[i], "r");
@@ -818,7 +875,6 @@ public class FileClient
 						}
 						else
 						{	// cria directoria na dropbox
-							System.out.println("Ficheiro novo e sou pasta");
 							pr.mkdir(dir + "/" + dirList[i]);
 							System.out.println("Sincronizada directoria: " + dirList[i]);
 							filesListLocal.put(dir_local + "/" + dirList[i], this.getFileInfo(dir_local + "/" + dirList[i]).modified);
@@ -834,72 +890,72 @@ public class FileClient
 				}
 			}	
 
-//			for(int j = 0; j < dropList.length; j++)
-//			{
-//				if(filesListRemote.containsKey(dropList[j].substring(1)))
-//				{
-//					try 
-//					{
-//						if(filesListRemote.get(dropList[j].substring(1)).before(pr.getAttr(dropList[j].substring(1)).modified))
-//						{
-//							byte[] buffer = pr.copyFile(dropList[j].substring(1));
-//							File file = new File(dir_local, pr.getAttr(dropList[j].substring(1)).name);
-//
-//							if(pr.getAttr(dropList[j].substring(1)).isFile)
-//							{
-//								OutputStream out = new FileOutputStream(file);
-//								out.write(buffer);
-//								out.close();
-//								System.out.println("Sincronizado ficheiro: " + file.getName());
-//								filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);
-//								filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
-//							}
-//							else
-//							{
-//								file.mkdir();
-//								filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);
-//								filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
-//								System.out.println("Sincronizada directoria: " + file.getName());
-//								this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
-//							}
-//						}
-//					}
-//					catch (Exception e) 
-//					{
-//						e.printStackTrace();
-//					} 
-//				}
-//				else
-//				{
-//					try 
-//					{
-//						byte[] buffer = pr.copyFile(dropList[j].substring(1));
-//						File file = new File(dir_local, pr.getAttr(dropList[j].substring(1)).name);
-//
-//						if(pr.getAttr(dropList[j].substring(1)).isFile)
-//						{
-//							OutputStream out = new FileOutputStream(file);
-//							out.write(buffer);
-//							out.close();
-//							System.out.println("Sincronizado ficheiro: " + file.getName());
-//							filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);							
-//							filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
-//						}
-//						else
-//						{
-//							file.mkdir();
-//							filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);							
-//							filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
-//							System.out.println("Sincronizada directoria: " + file.getName());
-//							this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
-//						}
-//					} 
-//					catch (Exception e)
-//					{
-//						e.printStackTrace();
-//					}
-//				}
-//			}
+			for(int j = 0; j < dropList.length; j++)
+			{
+				if(filesListRemote.containsKey(dropList[j].substring(1)))
+				{
+					try 
+					{
+						if(filesListRemote.get(dropList[j].substring(1)).before(pr.getAttr(dropList[j].substring(1)).modified))
+						{
+							byte[] buffer = pr.copyFile(dropList[j].substring(1));
+							File file = new File(dir_local, pr.getAttr(dropList[j].substring(1)).name);
+
+							if(pr.getAttr(dropList[j].substring(1)).isFile)
+							{
+								OutputStream out = new FileOutputStream(file);
+								out.write(buffer);
+								out.close();
+								System.out.println("Sincronizado ficheiro: " + file.getName());
+								filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);
+								filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+							}
+							else
+							{
+								file.mkdir();
+								filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);
+								filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+								System.out.println("Sincronizada directoria: " + file.getName());
+								this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
+							}
+						}
+					}
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+					} 
+				}
+				else
+				{
+					try 
+					{
+						byte[] buffer = pr.copyFile(dropList[j].substring(1));
+						File file = new File(dir_local, pr.getAttr(dropList[j].substring(1)).name);
+
+						if(pr.getAttr(dropList[j].substring(1)).isFile)
+						{
+							OutputStream out = new FileOutputStream(file);
+							out.write(buffer);
+							out.close();
+							System.out.println("Sincronizado ficheiro: " + file.getName());
+							filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);							
+							filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+						}
+						else
+						{
+							file.mkdir();
+							filesListRemote.put(dropList[j].substring(1), pr.getAttr(dropList[j].substring(1)).modified);							
+							filesListLocal.put(dir_local + "/" + file.getName(), this.getFileInfo(dir_local + "/" + file.getName()).modified);
+							System.out.println("Sincronizada directoria: " + file.getName());
+							this.sync(dir_local + "/" + file.getName(), server, user, dir + "/" + file.getName());
+						}
+					} 
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 
 		return true;
@@ -1070,6 +1126,7 @@ public class FileClient
 				boolean b = sync( dir_local, server, user, dir);
 				
 				localFound.clear();
+				remoteFound.clear();
 				
 				if( b)
 					System.out.println( "success");
