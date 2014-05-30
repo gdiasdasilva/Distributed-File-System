@@ -386,57 +386,57 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 					+ "commons-codec-1.7.jar:. trab1.ProxyGoogleDrive serverName contactServerUrl userName");
 			return;
 		}
-//
-//		try { // start rmiregistry
-//			LocateRegistry.createRegistry( 1099);
-//		} catch( RemoteException e) { 
-//			// if not start it
-//			// do nothing - already started with rmiregistry
-//		}
-//
-//		String serverName = args[0];	
-//		String ip = InetAddress.getLocalHost().getHostAddress().toString();
-//		String contactServerUrl = "";
-//		String userName = "";
-//		int flag = 0;
-//
-//		if (args.length == 3)
-//		{
-//			contactServerUrl = args[1];
-//			userName = args[2];
-//			flag++;
-//		}
-//		else
-//		{
-//			userName = args[1];
-//
-//			// Call multicast client to get contact server ip
-//
-//			int port = 5000;
-//			String group = "225.4.5.6";
-//
-//			try{
-//				MulticastSocket s = new MulticastSocket(port);
-//				s.joinGroup(InetAddress.getByName(group));
-//
-//				byte buf[] = new byte[1024];
-//				DatagramPacket pack = new DatagramPacket(buf, buf.length);
-//				s.setSoTimeout(2000); 
-//				s.receive(pack);
-//
-//				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
-//
-//				s.leaveGroup(InetAddress.getByName(group));
-//				s.close();
-//				flag++;
-//			} 
-//			catch(Exception e)
-//			{
-//				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
-//				System.exit(0);
-//			}
-//		}
-//
+
+		try { // start rmiregistry
+			LocateRegistry.createRegistry( 1099);
+		} catch( RemoteException e) { 
+			// if not start it
+			// do nothing - already started with rmiregistry
+		}
+
+		String serverName = args[0];	
+		String ip = InetAddress.getLocalHost().getHostAddress().toString();
+		String contactServerUrl = "";
+		String userName = "";
+		int flag = 0;
+
+		if (args.length == 3)
+		{
+			contactServerUrl = args[1];
+			userName = args[2];
+			flag++;
+		}
+		else
+		{
+			userName = args[1];
+
+			// Call multicast client to get contact server ip
+
+			int port = 5000;
+			String group = "225.4.5.6";
+
+			try{
+				MulticastSocket s = new MulticastSocket(port);
+				s.joinGroup(InetAddress.getByName(group));
+
+				byte buf[] = new byte[1024];
+				DatagramPacket pack = new DatagramPacket(buf, buf.length);
+				s.setSoTimeout(2000); 
+				s.receive(pack);
+
+				contactServerUrl = new String(pack.getData(), 0, pack.getLength());			
+
+				s.leaveGroup(InetAddress.getByName(group));
+				s.close();
+				flag++;
+			} 
+			catch(Exception e)
+			{
+				System.out.println("Erro ao receber o endereco do Contact Server por Multicast.");
+				System.exit(0);
+			}
+		}
+
 		try
 		{
 			OAuthService service = new ServiceBuilder().provider(Google2Api.class).apiKey(API_ID).
@@ -457,8 +457,8 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			
 			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
 			
-//			Naming.rebind( "/" + serverName + "@" + userName, server);
-//			flag++;
+			Naming.rebind( "/" + serverName + "@" + userName, server);
+			flag++;
 		}
 		catch(Exception e)
 		{
@@ -466,12 +466,12 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			e.printStackTrace();
 			System.exit(0);
 		}
-//
-//		if(flag == 2)
-//		{
-//			register(serverName, contactServerUrl, userName, ip);
-//			System.out.println("ProxyGoogleDrive RMI running in " + ip + " ...");
-//		}
+
+		if(flag == 2)
+		{
+			register(serverName, contactServerUrl, userName, ip);
+			System.out.println("ProxyGoogleDrive RMI running in " + ip + " ...");
+		}
 	}
 
 

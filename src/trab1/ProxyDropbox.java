@@ -315,11 +315,6 @@ public class ProxyDropbox extends UnicastRemoteObject implements IProxyRest {
 			verifier = new Verifier(requestToken.getSecret());
 			Token accessToken = service.getAccessToken(requestToken, verifier);
 			
-			//Escrever token para ficheiro
-//			FileWriter fw = new FileWriter("TokenFile.txt");
-//			fw.write(accessToken.toString());
-//			fw.flush();
-			
 			IProxyRest server = new ProxyDropbox(service, accessToken);
 			Naming.rebind( "/" + serverName + "@" + userName, server);
 			flag++;
