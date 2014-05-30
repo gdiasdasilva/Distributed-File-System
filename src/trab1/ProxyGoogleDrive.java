@@ -54,9 +54,62 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 	@Override
 	public String[] dir(String dir) throws InfoNotFoundException,
 	RemoteException {
+		
+		String id = null;
+		String[] list_dir = null;
 
+		String[] path = dir.split("/");
+			
+		if(dir.equals(""))
+		{
+			id = getId("root");
+		}
+		else
+		{
+			if(path.length == 1)
+			{
+				id = getId(path[0]);
+			}
+			else
+			{
+				id = getId(path[path.length-1]);
+			}
+			
+		}
+		
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_URL + id + "/children");
+		service.signRequest(token, request);
+		Response response = request.send();
+		
+		if(response.getCode() != 200)
+			throw new InfoNotFoundException("Directoria nao encontrada: " + dir);
 
-		return null;
+		else{
+			try {
+				JSONObject jo = (JSONObject) parser.parse(response.getBody());
+				JSONArray items = (JSONArray) jo.get("items");
+				Iterator it = items.iterator();
+				list_dir = new String[items.size()];
+				int i = 0;
+				while (it.hasNext())
+				{
+					JSONObject file = (JSONObject) it.next();
+					String id_child = (String) file.get("id");
+					OAuthRequest req = new OAuthRequest(Verb.GET, GET_URL + id_child);
+					service.signRequest(token, req);
+					Response res = req.send();
+					JSONObject json = (JSONObject) parser.parse(res.getBody());
+					list_dir[i] = json.get("title").toString();
+					i++;
+				}	
+			}
+			catch (Exception e) 
+			{
+				System.out.println("Erro no listar directoria");
+			}
+		}
+
+		return list_dir;
 	}
 
 	private String getId(String dir){
@@ -283,26 +336,10 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			
 			ba.write(multipartRequestBody.getBytes());
 			request.addPayload(ba.toString());
-			
-			
-			
-//			String content = "--" + boundary + "\nContent-type: application/json; charset=UTF-8\n" + js.toString() + "\n" +
-//			"--" + boundary + "Content-Type: image/jpeg\n";
-			
-//			ba.write(content.getBytes());
-//			ba.write(f);
-//			ba.write(final_boundary.getBytes());
 
-//			request.addPayload(ba.toString());
 			Response response = request.send();
 					
-//			//2a parte
-//			OAuthRequest req = new OAuthRequest(Verb.PUT, UPLOAD + "&upload_id=" + response.getHeader("Location"));
-//			service.signRequest(token, req);
-//			req.addHeader("Content-Length",String.valueOf(f.length));
-//			request.addHeader("Content-Type", "image/jpeg");
-//			req.addPayload(f);
-//			response = req.send();
+
 			if(response.getCode() != 200)
 				return false;
 			else
@@ -315,8 +352,6 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 
 	@Override
 	public byte[] copyFile(String fromPath) throws RemoteException {
-		//Por alguma razao o json so vem com todos os campos com o ficheiro pdf que ja estava na drive
-		// com um criado por nos na drive os campos fileSize e dowloadUrl nao existem?!!!?!?!
 		
 		String id = getId(fromPath);
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_URL + id);
@@ -325,7 +360,6 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 		try {
 			Response response = request.send();
 			JSONObject res = (JSONObject) parser.parse(response.getBody());
-//			long tmp = Long.parseLong(res.get("fileSize"));
 			int tmp = Integer.parseInt((String) res.get("fileSize"));
 			byte[] buffer = new byte[tmp];
 			String fileUrl = res.get("downloadUrl").toString();
@@ -334,12 +368,7 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			response = req.send();
 			DataInputStream dis = new DataInputStream(response.getStream());
 			dis.readFully(buffer);
-//			InputStream input = response.getStream();
 
-//			for(int i = 0; i<buffer.length; i++)
-//				buffer[i] = (byte) input.read();
-//
-//			input.close();
 			return buffer;
 
 		} catch (Exception e) {
@@ -428,9 +457,6 @@ public class ProxyGoogleDrive extends UnicastRemoteObject implements IProxyRest{
 			
 			IProxyRest server = new ProxyGoogleDrive(service, accessToken);
 			
-			
-			byte[] f = server.copyFile("goncalo");
-			System.out.println(server.pasteFile(f, "Pinto/bla/teste2"));
 //			Naming.rebind( "/" + serverName + "@" + userName, server);
 //			flag++;
 		}
