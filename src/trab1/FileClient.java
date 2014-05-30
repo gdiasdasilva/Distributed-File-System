@@ -33,6 +33,7 @@ public class FileClient
 	IProxyRest pr;
 	private Map<String, Date> filesListLocal;
 	private Map<String, Date> filesListRemote;
+	private Map<String, Boolean> localFound;
 	private static String basePath = ".";
 
 	protected FileClient( String url, String username) throws Exception {
@@ -41,6 +42,7 @@ public class FileClient
 		cs = (IContactServer) Naming.lookup("//" + contactServerURL + "/trabalhoSD");
 		filesListLocal = new HashMap<String, Date>();
 		filesListRemote = new HashMap<String, Date>();
+		localFound = new HashMap<String, Boolean>();
 		
 	}
 
@@ -662,9 +664,6 @@ public class FileClient
 			firstSync(dir_local, server, user, dir);
 		else
 		{
-			int count = 0;
-			String[] dirPassed = null;
-			dirPassed[count++] = dir_local;
 			System.out.println("mapas nao vazios");
 			try
 			{
@@ -690,6 +689,7 @@ public class FileClient
 			for(int i = 0; i<dirList.length; i++){
 				System.out.println(dirList[i]);
 			}
+			
 			String[] dropList = null;
 
 			Iterator<String> it = filesListLocal.keySet().iterator();
@@ -699,24 +699,24 @@ public class FileClient
 			{	
 				String key = it.next();
 				boolean hasFile = false;
-//				System.out.println("KEY: " + key);
 				for(int i = 0; i < dirList.length; i++)
 				{
 					String[] stringSplitLocal = key.split("/");
 					if(filesListLocal.containsKey(key))
 					{
-						System.out.println("DIR LIST: "+ dirList[i]);
-						System.out.println("contenho a key");
-						System.out.println("KEY SPLIT: "+ stringSplitLocal[stringSplitLocal.length-1]);
 						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
 						{
 							hasFile = true;
+							localFound.put(key, true);
 						}	
 					}
 				}
+				
 				if(!hasFile)
 				{
-					keyList.add(key);
+					if(!localFound.containsKey(key))
+						keyList.add(key);
+					
 					try
 					{
 						String[] tmp = filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
@@ -726,8 +726,12 @@ public class FileClient
 							String[] stringSplit = key.split("/");
 							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
 							{
-								pr.rm(tmp[j]);
-								filesListRemote.remove(tmp[j]);
+								if(!localFound.containsKey(key))
+								{
+									pr.rm(tmp[j]);
+									filesListRemote.remove(tmp[j]);
+								}
+								
 							}
 						}
 					} 
@@ -754,9 +758,10 @@ public class FileClient
 			{
 				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
 			} 
+			
 			System.out.println("Lista Local: " +filesListLocal.keySet().toString());
 			System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
-			
+			System.out.println("Lista Found : " + localFound.keySet().toString());
 
 			for(int i = 0; i < dirList.length;i++)
 			{
@@ -1063,6 +1068,9 @@ public class FileClient
 				String dir = dirserver.length == 1 ? dirserver[0] : dirserver[1];
 
 				boolean b = sync( dir_local, server, user, dir);
+				
+				localFound.clear();
+				
 				if( b)
 					System.out.println( "success");
 				else
