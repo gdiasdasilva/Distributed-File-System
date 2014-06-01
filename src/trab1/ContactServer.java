@@ -163,6 +163,6 @@ public class ContactServer extends UnicastRemoteObject implements IContactServer
 		String ip = InetAddress.getLocalHost().getHostAddress().toString();
 		System.out.println( "ContactServer running in " + ip + " ...");
 	    
-//	    new Thread(new MulticastServer()).start();
+	    new Thread(new MulticastServer()).start();
 	}
 }
