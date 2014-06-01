@@ -596,7 +596,6 @@ public class FileClient
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
 					return false;	
 				}
 			}
@@ -640,7 +639,7 @@ public class FileClient
 					}
 					catch (Exception e)
 					{
-						e.printStackTrace();
+						
 					}
 				}
 			}
@@ -689,65 +688,65 @@ public class FileClient
 			String[] dirList = dirListArray.toArray(new String[dirListArray.size()]);
 			
 			String[] dropList = null;
-
-			Iterator<String> it = filesListLocal.keySet().iterator();
-			List<String> keyList = new ArrayList<String>();
-
-			while(it.hasNext())
-			{	
-				String key = it.next();
-				boolean hasFile = false;
-				for(int i = 0; i < dirList.length; i++)
-				{
-					String[] stringSplitLocal = key.split("/");
-					if(filesListLocal.containsKey(key))
-					{
-						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
-						{
-							hasFile = true;
-							localFound.put(key, true);
-						}	
-					}
-				}
-				
-				if(!hasFile)
-				{
-					if(!localFound.containsKey(key))
-						keyList.add(key);
-					
-					try
-					{
-						String[] tmp = filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
-
-						for(int j = 0; j < tmp.length; j++)
-						{
-							String[] stringSplit = key.split("/");
-							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
-							{
-								if(!localFound.containsKey(key))
-								{
-									pr.rm(tmp[j]);
-									filesListRemote.remove(tmp[j]);
-								}
-								
-							}
-						}
-					} 
-					catch (Exception e) 
-					{
-						System.out.println("Erro ao apagar o ficheiro na sincronizacao da dropbox");
-						e.printStackTrace();
-					}
-				}
-			}
-
-			String[] keys = keyList.toArray(new String[keyList.size()]);
-
-			for(int k = 0; k < keys.length; k++)
-			{
-				filesListLocal.remove(keys[k]);
-			}
-
+//
+//			Iterator<String> it = filesListLocal.keySet().iterator();
+//			List<String> keyList = new ArrayList<String>();
+//
+//			while(it.hasNext())
+//			{	
+//				String key = it.next();
+//				boolean hasFile = false;
+//				for(int i = 0; i < dirList.length; i++)
+//				{
+//					String[] stringSplitLocal = key.split("/");
+//					if(filesListLocal.containsKey(key))
+//					{
+//						if(dirList[i].contains(stringSplitLocal[stringSplitLocal.length-1]))
+//						{
+//							hasFile = true;
+//							localFound.put(key, true);
+//						}	
+//					}
+//				}
+//				
+//				if(!hasFile)
+//				{
+//					if(!localFound.containsKey(key))
+//						keyList.add(key);
+//					
+//					try
+//					{
+//						String[] tmp = filesListRemote.keySet().toArray(new String[filesListRemote.size()]);
+//
+//						for(int j = 0; j < tmp.length; j++)
+//						{
+//							String[] stringSplit = key.split("/");
+//							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
+//							{
+//								if(!localFound.containsKey(key))
+//								{
+//									pr.rm(tmp[j]);
+//									filesListRemote.remove(tmp[j]);
+//								}
+//								
+//							}
+//						}
+//					} 
+//					catch (Exception e) 
+//					{
+//						System.out.println("Erro ao apagar o ficheiro na sincronizacao da dropbox");
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			String[] keys = keyList.toArray(new String[keyList.size()]);
+//
+//			for(int k = 0; k < keys.length; k++)
+//			{
+//				filesListLocal.remove(keys[k]);
+//			}
+//
 			try
 			{
 				dropList = pr.dir(dir);
@@ -756,67 +755,67 @@ public class FileClient
 			{
 				System.out.println("Erro ao lista directoria no metodo sync. A dir era " + dir);
 			} 
-			
-			Iterator<String> itR = filesListRemote.keySet().iterator();
-			List<String> keyListR = new ArrayList<String>();
-			
-			while(itR.hasNext())
-			{
-				String keyR = itR.next();
-				boolean hasFile = false;
-				
-				for(int i = 0; i < dropList.length; i++)
-				{
-					String[] stringSplitRemote = keyR.split("/");
-					
-					if(filesListRemote.containsKey(keyR))
-					{
-						if(dropList[i].contains(stringSplitRemote[stringSplitRemote.length-1]))
-						{
-							hasFile = true;
-							remoteFound.put(keyR, true);
-						}	
-					}
-				}
-				
-				if(!hasFile)
-				{
-					if(!remoteFound.containsKey(keyR))
-						keyListR.add(keyR);
-					
-					try
-					{
-						String[] tmp = filesListLocal.keySet().toArray(new String[filesListLocal.size()]);
-
-						for(int j = 0; j < tmp.length; j++)
-						{
-							String[] stringSplit = keyR.split("/");
-							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
-							{
-								if(!remoteFound.containsKey(keyR))
-								{
-									File fr = new File(new File("."), tmp[j]);
-									fr.delete();
-									filesListLocal.remove(tmp[j]);
-								}
-								
-							}
-						}
-					} 
-					catch (Exception e) 
-					{
-						System.out.println("Erro ao apagar o ficheiro na sincronizacao da dropbox");
-						e.printStackTrace();
-					}
-				}
-			}
-
-			String[] keysr = keyListR.toArray(new String[keyListR.size()]);
-
-			for(int k = 0; k < keysr.length; k++)
-			{
-				filesListRemote.remove(keysr[k]);
-			}
+//			
+//			Iterator<String> itR = filesListRemote.keySet().iterator();
+//			List<String> keyListR = new ArrayList<String>();
+//			
+//			while(itR.hasNext())
+//			{
+//				String keyR = itR.next();
+//				boolean hasFile = false;
+//				
+//				for(int i = 0; i < dropList.length; i++)
+//				{
+//					String[] stringSplitRemote = keyR.split("/");
+//					
+//					if(filesListRemote.containsKey(keyR))
+//					{
+//						if(dropList[i].contains(stringSplitRemote[stringSplitRemote.length-1]))
+//						{
+//							hasFile = true;
+//							remoteFound.put(keyR, true);
+//						}	
+//					}
+//				}
+//				
+//				if(!hasFile)
+//				{
+//					if(!remoteFound.containsKey(keyR))
+//						keyListR.add(keyR);
+//					
+//					try
+//					{
+//						String[] tmp = filesListLocal.keySet().toArray(new String[filesListLocal.size()]);
+//
+//						for(int j = 0; j < tmp.length; j++)
+//						{
+//							String[] stringSplit = keyR.split("/");
+//							if(tmp[j].contains(stringSplit[stringSplit.length-1]))
+//							{
+//								if(!remoteFound.containsKey(keyR))
+//								{
+//									File fr = new File(new File("."), tmp[j]);
+//									fr.delete();
+//									filesListLocal.remove(tmp[j]);
+//								}
+//								
+//							}
+//						}
+//					} 
+//					catch (Exception e) 
+//					{
+//						System.out.println("Erro ao apagar o ficheiro na sincronizacao da dropbox");
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			String[] keysr = keyListR.toArray(new String[keyListR.size()]);
+//
+//			for(int k = 0; k < keysr.length; k++)
+//			{
+//				filesListRemote.remove(keysr[k]);
+//			}
 			
 //			System.out.println("Lista Local: " +filesListLocal.keySet().toString());
 //			System.out.println("Lista Remoto: " +filesListRemote.keySet().toString());
