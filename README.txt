@@ -1,7 +1,5 @@
 Sistemas Distribuídos 13/14
 1º Trabalho prático
-Gonçalo Dias da Silva: nº 41831
-João Francisco Pinto: nº 41887
 
 As classes a utilizar têm os seguintes nomes:
 
