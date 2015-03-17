@@ -24,12 +24,12 @@ The distributed file system is based on the following classes:
 `java trab1.FileServerWS server_name owner`
 
 #####Contact Server
-java trab1.ContactServer
+`java trab1.ContactServer`
 
 #####File Client
-java trab1.FileClient username
+`java trab1.FileClient username`
 
-You can add the **Contact Server**'s IP as a parameter in the commands above. In the case of a File Server, the IP goes after `server_name`, but in instances of File Client, you should put the IP before `username`.
+You can add the **Contact Server**'s IP as a parameter in the commands above. In the case of a File Server, the IP goes after *server_name*, but in instances of File Client, you should put the IP before *username*.
 
 ###Usage
 
