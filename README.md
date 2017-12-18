@@ -1,12 +1,12 @@
-#Distributed File System
+# Distributed File System
 
 First lab for Distributed System's course @ FCT/UNL, 2013/2014.
 
-###Authors
+### Authors
 * Gonçalo Dias da Silva
 * João Francisco Pinto
 
-###Main structure
+### Main structure
 
 The distributed file system is based on the following classes:
 
@@ -15,23 +15,23 @@ The distributed file system is based on the following classes:
 * ContactServer (class where the information (IP) about different clients and servers is stored)
 * FileClient
 
-###Running the distributed file system
+### Running the distributed file system
 
-#####File Server (RMI)
+##### File Server (RMI)
 `java trab1.FileServer server_name owner`
 
-#####File Server (Web Services)
+##### File Server (Web Services)
 `java trab1.FileServerWS server_name owner`
 
-#####Contact Server
+##### Contact Server
 `java trab1.ContactServer`
 
-#####File Client
+##### File Client
 `java trab1.FileClient username`
 
 You can add the **Contact Server**'s IP as a parameter in the commands above. In the case of a File Server, the IP goes after *server_name*, but in instances of File Client, you should put the IP before *username*.
 
-###Usage
+### Usage
 
 * **servers** - shows the list of all online servers
 * **addPermission server user2** - adds user2 to the list of users with permission to access the server *server@user* (being *user* the one that is running the program)
